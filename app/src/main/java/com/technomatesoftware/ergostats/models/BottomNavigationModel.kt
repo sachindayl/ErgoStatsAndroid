@@ -4,6 +4,6 @@ enum class Routes(val value: String) {
     HOME("home"),
     METRICS("metrics"),
     RANK("rank"),
-    RICHLIST("account"),
-    AGEUSD("ageUsd")
+    RICHLIST("rich list"),
+    AGEUSD("age usd")
 }

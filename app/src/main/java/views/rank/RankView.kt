@@ -2,6 +2,7 @@ package views.rank
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -11,34 +12,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.technomatesoftware.ergostats.components.BottomNavigationBar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RankView(
-    navController: NavController,
+    padding: PaddingValues
 ) {
-    Scaffold(bottomBar = { BottomNavigationBar(navController) }) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+    Column(
+        modifier = Modifier
+            .padding(padding)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
 
-        ) {
-            Text("Rank View")
-        }
+    ) {
+        Text("Rank View")
     }
-
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewSearchView() {
-    val navController = rememberNavController()
-    RankView(navController = navController)
+    Scaffold { padding ->
+        RankView(padding = padding)
+    }
 }

@@ -1,8 +1,10 @@
 package com.technomatesoftware.ergostats.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -10,6 +12,8 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -30,10 +34,10 @@ fun BottomNavigationBar(
 
     val icons = listOf(
         Icons.Default.Menu,
+        Icons.Default.DateRange,
         Icons.Default.Search,
-        Icons.Default.Person,
-        Icons.Default.Person,
-        Icons.Default.Person
+        Icons.Default.Favorite,
+        Icons.Default.AccountBox
     )
 
     NavigationBar {
@@ -42,7 +46,7 @@ fun BottomNavigationBar(
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = { Icon(icons[index], contentDescription = item.name) },
-                label = { Text(item.name) },
+                label = { Text(item.value.toUpperCase(Locale.current)) },
                 selected = currentRoute == item.value,
                 onClick = {
                     navController.navigate(item.value) {

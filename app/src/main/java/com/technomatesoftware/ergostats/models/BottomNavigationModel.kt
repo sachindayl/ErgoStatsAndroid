@@ -5,5 +5,5 @@ enum class Routes(val value: String) {
     METRICS("metrics"),
     RANK("rank"),
     RICHLIST("rich list"),
-    AGEUSD("age usd")
+    AGEUSD("age usd"),
 }

@@ -8,15 +8,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.technomatesoftware.ergostats.R
+import com.technomatesoftware.ergostats.ui.theme.CorrectGreen
+import com.technomatesoftware.ergostats.ui.theme.WrongRed
 
 @Composable
 fun AgeUsdTableItem(
@@ -35,19 +37,24 @@ fun AgeUsdTableItem(
             Icon(
                 Icons.Rounded.CheckCircle,
                 contentDescription = "Check",
-                tint = Color.Green,
+                tint = CorrectGreen,
                 modifier = Modifier.padding(end = 8.dp)
             )
-            Text(label, color = Color.Green, modifier = Modifier.fillMaxHeight())
+            Text(label, color = CorrectGreen, modifier = Modifier.fillMaxHeight())
         } else {
-
             Icon(
-                Icons.Rounded.Clear,
+                painter = painterResource(R.drawable.cancel_icon),
                 contentDescription = "Clear",
-                tint = Color.Red,
+                tint = WrongRed,
                 modifier = Modifier.padding(end = 8.dp)
             )
-            Text(label, color = Color.Red, modifier = Modifier.fillMaxHeight())
+//            Icon(
+//                Icons.Rounded.Clear,
+//                contentDescription = "Clear",
+//                tint = WrongRed,
+//                modifier = Modifier.padding(end = 8.dp)
+//            )
+            Text(label, color = WrongRed, modifier = Modifier.fillMaxHeight())
         }
 
     }

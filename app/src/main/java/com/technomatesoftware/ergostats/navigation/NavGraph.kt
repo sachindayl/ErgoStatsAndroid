@@ -15,7 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.technomatesoftware.ergostats.components.BottomNavigationBar
-import com.technomatesoftware.ergostats.models.Routes
+import com.technomatesoftware.ergostats.domain.models.Routes
 import views.ageusd.AgeUsdView
 import views.home.HomeView
 import views.metrics.MetricsView

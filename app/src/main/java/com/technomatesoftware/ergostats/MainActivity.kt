@@ -9,7 +9,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.technomatesoftware.ergostats.navigation.NavGraph
 import com.technomatesoftware.ergostats.ui.theme.ErgoStatsTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 

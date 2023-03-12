@@ -1,4 +1,4 @@
-package com.technomatesoftware.ergostats.models
+package com.technomatesoftware.ergostats.domain.models
 
 enum class Routes(val value: String) {
     HOME("home"),

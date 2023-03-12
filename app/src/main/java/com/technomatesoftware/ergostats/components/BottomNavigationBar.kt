@@ -18,7 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.technomatesoftware.ergostats.models.Routes
+import com.technomatesoftware.ergostats.domain.models.Routes
 
 @Composable
 fun BottomNavigationBar(

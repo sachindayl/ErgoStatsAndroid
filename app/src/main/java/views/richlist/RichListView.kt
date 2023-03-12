@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.technomatesoftware.ergostats.CustomWebView
-import com.technomatesoftware.ergostats.models.RichModel
+import com.technomatesoftware.ergostats.domain.models.RichModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

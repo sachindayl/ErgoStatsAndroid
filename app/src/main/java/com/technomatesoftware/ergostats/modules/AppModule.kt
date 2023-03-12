@@ -1,5 +1,8 @@
 package com.technomatesoftware.ergostats.modules
 
+import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
+import com.technomatesoftware.ergostats.network.repository.CoinGeckoRepositoryImpl
+import com.technomatesoftware.ergostats.network.services.CoinGeckoService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -46,38 +49,37 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient { // The Interceptor is then added to the client
+    fun provideOkHttpClient(): OkHttpClient {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
         return OkHttpClient.Builder()
-            .addInterceptor(
-                HttpLoggingInterceptor()
-                    .setLevel(HttpLoggingInterceptor.Level.BODY)
-            )
+            .addInterceptor(interceptor)
             .build()
     }
 
-    @Provides
-    fun provideErgoWatchRetrofit(
-        okHttpClient: OkHttpClient,
-        @Named("ERGO_WATCH_API") webAPI: String,
-    ): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(webAPI)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-    }
-
-    @Provides
-    fun provideErgoPlatformRetrofit(
-        okHttpClient: OkHttpClient,
-        @Named("ERGO_PLATFORM_API") webAPI: String,
-    ): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(webAPI)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-    }
+//    @Provides
+//    fun provideErgoWatchRetrofit(
+//        okHttpClient: OkHttpClient,
+//        @Named("ERGO_WATCH_API") webAPI: String,
+//    ): Retrofit {
+//        return Retrofit.Builder()
+//            .baseUrl(webAPI)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .client(okHttpClient)
+//            .build()
+//    }
+//
+//    @Provides
+//    fun provideErgoPlatformRetrofit(
+//        okHttpClient: OkHttpClient,
+//        @Named("ERGO_PLATFORM_API") webAPI: String,
+//    ): Retrofit {
+//        return Retrofit.Builder()
+//            .baseUrl(webAPI)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .client(okHttpClient)
+//            .build()
+//    }
 
     @Provides
     fun provideCoinGeckoRetrofit(
@@ -91,15 +93,27 @@ class AppModule {
             .build()
     }
 
+//    @Provides
+//    fun provideTokenJayRetrofit(
+//        okHttpClient: OkHttpClient,
+//        @Named("TOKEN_JAY_API") webAPI: String,
+//    ): Retrofit {
+//        return Retrofit.Builder()
+//            .baseUrl(webAPI)
+//            .addConverterFactory(GsonConverterFactory.create())
+//            .client(okHttpClient)
+//            .build()
+//    }
+
     @Provides
-    fun provideTokenJayRetrofit(
-        okHttpClient: OkHttpClient,
-        @Named("TOKEN_JAY_API") webAPI: String,
-    ): Retrofit {
-        return Retrofit.Builder()
-            .baseUrl(webAPI)
-            .addConverterFactory(GsonConverterFactory.create())
-            .client(okHttpClient)
-            .build()
-    }
+    fun provideCoinGeckoService(
+        retrofit: Retrofit
+    ): CoinGeckoService = retrofit.create(CoinGeckoService::class.java)
+
+    @Provides
+    fun provideCoinGeckoRepository(
+        coinGeckoService: CoinGeckoService,
+    ): CoinGeckoRepository = CoinGeckoRepositoryImpl(
+        coinGeckoService = coinGeckoService,
+    )
 }

@@ -16,6 +16,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,13 +28,24 @@ import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
 import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.technomatesoftware.ergostats.components.Heading
+import com.technomatesoftware.ergostats.viewmodel.HomeViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun HomeView(
+    homeViewModel: HomeViewModel = hiltViewModel(),
     padding: PaddingValues
 ) {
 
     val chartEntryModel = entryModelOf(4f, 12f, 8f, 16f, 22f)
+
+    fun launch() {
+        homeViewModel.coinMarketData()
+    }
+
+    LaunchedEffect(key1 = true) {
+        launch()
+    }
 
     Column(
         modifier = Modifier

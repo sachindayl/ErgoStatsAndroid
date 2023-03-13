@@ -85,14 +85,14 @@ class HomeViewModel @Inject constructor(
                 when (response) {
                     is Response.Success -> {
                         val filteredList = response.data?.prices?.filterIndexed { index, _ ->
-                            (index + 1) % 7 == 0
+                            (index + 1) % 6 == 0
                         }
 
                         val chartEntryModelProducer =
                             filteredList?.mapIndexed { index, data ->
                                 Log.d("TESTING3", response.data.getDate(index))
                                 CustomChartAxisModel(
-                                    response.data.getDate(index * 7),
+                                    response.data.getDate(index * 6),
                                     index.toFloat(),
                                     data[1].toFloat()
                                 )
@@ -107,6 +107,7 @@ class HomeViewModel @Inject constructor(
 
                         val endAxisValueFormatter =
                             AxisValueFormatter<AxisPosition.Vertical.End> { value, chartValues ->
+
                                 val roundedValue = (chartValues.chartEntryModel.entries.first()
                                     .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toBigDecimal()
                                     ?.setScale(2, RoundingMode.HALF_UP)

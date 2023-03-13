@@ -86,4 +86,28 @@ data class CoinMarketDataModel(
         }
         return "0.00"
     }
+
+    fun formattedTotalVolume(): String {
+        if (totalVolume != null) {
+            val formatter = DecimalFormat("#,###.##")
+            return "$${formatter.format(totalVolume)}"
+        }
+        return "0.00"
+    }
+
+    fun formattedLow24h(): String {
+        if (low24H != null) {
+            val formatter = DecimalFormat("#,###.##")
+            return "$${formatter.format(low24H)}"
+        }
+        return "0.00"
+    }
+
+    fun formattedHigh24h(): String {
+        if (high24H != null) {
+            val formatter = DecimalFormat("#,###.##")
+            return "$${formatter.format(high24H)}"
+        }
+        return "0.00"
+    }
 }

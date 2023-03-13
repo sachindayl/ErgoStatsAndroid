@@ -49,8 +49,8 @@ fun NavGraph(
             composable(Routes.HOME.value) { HomeView(padding = padding) }
             composable(Routes.METRICS.value) { MetricsView(padding = padding) }
             composable(Routes.RANK.value) { RankView(padding = padding) }
-            composable(Routes.RICHLIST.value) { RichListView(padding = padding) }
-            composable(Routes.AGEUSD.value) { AgeUsdView(padding = padding) }
+            composable(Routes.RICH_LIST.value) { RichListView(padding = padding) }
+            composable(Routes.AGE_USD.value) { AgeUsdView(padding = padding) }
         }
     }
 

@@ -27,9 +27,9 @@ fun BottomNavigationBar(
     val items = listOf(
         Routes.HOME,
         Routes.METRICS,
-        Routes.RICHLIST,
+        Routes.RICH_LIST,
         Routes.RANK,
-        Routes.AGEUSD
+        Routes.AGE_USD
     )
 
     val icons = listOf(

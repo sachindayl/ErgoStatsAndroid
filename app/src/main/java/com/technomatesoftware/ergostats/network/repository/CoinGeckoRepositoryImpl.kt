@@ -2,7 +2,8 @@ package com.technomatesoftware.ergostats.network.repository
 
 import android.util.Log
 import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
-import com.technomatesoftware.ergostats.domain.models.CoinGeckoModel
+import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
+import com.technomatesoftware.ergostats.domain.models.CoinMarketPriceChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.network.services.CoinGeckoService
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +18,7 @@ import javax.inject.Singleton
 class CoinGeckoRepositoryImpl @Inject constructor(
     private val coinGeckoService: CoinGeckoService
 ) : CoinGeckoRepository {
-    override suspend fun getCoinMarketData(): Flow<Response<List<CoinGeckoModel>>> = flow {
+    override suspend fun getCoinMarketData(): Flow<Response<List<CoinMarketDataModel>>> = flow {
         try {
             emit(Response.Loading)
             val result = coinGeckoService.getCoinMarketData(
@@ -27,7 +28,7 @@ class CoinGeckoRepositoryImpl @Inject constructor(
                 perPage = 10,
                 page = 1,
                 sparkLine = true,
-                priceChangePercentage = "24h"
+                priceChangePercentage = "30d"
             )
             emit(Response.Success(result))
         } catch (e: Exception) {
@@ -36,4 +37,23 @@ class CoinGeckoRepositoryImpl @Inject constructor(
         }
 
     }.flowOn(Dispatchers.IO)
+
+    override suspend fun getCoinMarketPriceChartData(): Flow<Response<CoinMarketPriceChartDataModel>> =
+        flow {
+            try {
+                emit(Response.Loading)
+                val result = coinGeckoService.getCoinMarketPriceChartData(
+                    vsCurrency = "usd",
+                    days = 30,
+                    interval = "daily"
+                )
+                emit(Response.Success(result))
+            } catch (e: Exception) {
+                Log.d("getCoinMarketData", e.message.toString())
+                emit(Response.Failure(e))
+            }
+
+        }.flowOn(Dispatchers.IO)
+
+
 }

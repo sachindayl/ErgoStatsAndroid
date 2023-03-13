@@ -1,6 +1,7 @@
 package com.technomatesoftware.ergostats.network.services
 
-import com.technomatesoftware.ergostats.domain.models.CoinGeckoModel
+import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
+import com.technomatesoftware.ergostats.domain.models.CoinMarketPriceChartDataModel
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -15,5 +16,12 @@ interface CoinGeckoService {
         @Query("page") page: Int,
         @Query("sparkline") sparkLine: Boolean,
         @Query("price_change_percentage") priceChangePercentage: String,
-    ) : List<CoinGeckoModel>
+    ) : List<CoinMarketDataModel>
+
+    @GET("coins/ergo/market_chart")
+    suspend fun getCoinMarketPriceChartData(
+        @Query("vs_currency") vsCurrency: String,
+        @Query("days") days: Int,
+        @Query("interval") interval: String,
+    ) : CoinMarketPriceChartDataModel
 }

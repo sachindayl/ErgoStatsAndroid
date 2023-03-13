@@ -1,6 +1,5 @@
 package com.technomatesoftware.ergostats.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,9 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntry
-import com.patrykandpatrick.vico.core.entry.ChartEntryModel
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.patrykandpatrick.vico.core.entry.entryModelOf
 import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartAxisModel
@@ -19,6 +16,9 @@ import com.technomatesoftware.ergostats.domain.models.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.math.RoundingMode
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,13 +27,22 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _coinGeckoState =
         mutableStateOf<Response<List<CoinMarketDataModel>>>(Response.Success(null))
-    private val _coinGeckoChartState = mutableStateOf<ChartEntryModel>(entryModelOf(0.0))
     private val _coinGeckoChartEntryState = mutableStateOf(
         CustomChartEntryModel(ChartEntryModelProducer(), null, null)
     )
     val coinGeckoState: State<Response<List<CoinMarketDataModel>>> = _coinGeckoState
-    val coinGeckoChartState: State<ChartEntryModel> = _coinGeckoChartState
     val coinGeckoChartEntryState: State<CustomChartEntryModel> = _coinGeckoChartEntryState
+
+    init {
+       loadData()
+    }
+
+    fun loadData() {
+        viewModelScope.launch {
+            coinMarketData()
+            getCoinMarketChartData()
+        }
+    }
 
     fun coinMarketData() {
         viewModelScope.launch {
@@ -43,11 +52,8 @@ class HomeViewModel @Inject constructor(
                 when (val coinGeckoStats = _coinGeckoState.value) {
                     is Response.Success -> {
                         val pricesList = coinGeckoStats.data?.first()?.sparklineIn7D?.price
-                        val newEntries = ArrayList<Number>();
+                        val newEntries = ArrayList<Number>()
                         pricesList?.let { newEntries.addAll(it) }
-                        _coinGeckoChartState.value =
-                            entryModelOf(*emptyList<Number>().toTypedArray())
-                        _coinGeckoChartState.value = entryModelOf(*newEntries.toTypedArray())
                     }
 
                     else -> {}
@@ -85,18 +91,20 @@ class HomeViewModel @Inject constructor(
                 when (response) {
                     is Response.Success -> {
                         val filteredList = response.data?.prices?.filterIndexed { index, _ ->
-                            (index + 1) % 6 == 0
+                            index == response.data.prices.size -1 || (index + 1) % 7 == 0
                         }
 
                         val chartEntryModelProducer =
                             filteredList?.mapIndexed { index, data ->
-                                Log.d("TESTING3", response.data.getDate(index))
+                                val date = SimpleDateFormat("MMM d", Locale.getDefault()).format(
+                                    Date(data.first().toLong())
+                                )
                                 CustomChartAxisModel(
-                                    response.data.getDate(index * 6),
+                                    date,
                                     index.toFloat(),
                                     data[1].toFloat()
                                 )
-                            }.let { it -> ChartEntryModelProducer(it as List<ChartEntry>) }
+                            }.let { ChartEntryModelProducer(it as List<ChartEntry>) }
 
                         val bottomAxisValueFormatter =
                             AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, chartValues ->

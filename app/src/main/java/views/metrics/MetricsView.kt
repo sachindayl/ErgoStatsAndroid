@@ -35,7 +35,6 @@ import com.technomatesoftware.ergostats.viewmodel.MetricsViewModel
 
 @Composable
 fun MetricsView(
-    metricsViewModel: MetricsViewModel = hiltViewModel(),
     padding: PaddingValues
 ) {
     Column(
@@ -46,37 +45,7 @@ fun MetricsView(
         horizontalAlignment = Alignment.Start
 
     ) {
-        Heading("Addresses")
-        when (metricsViewModel.isSummaryAddressDataLoaded.value) {
-            is Response.Loading -> {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    CircularProgressIndicator()
-                }
-
-            }
-
-            is Response.Success -> {
-                AddressesList(metricsViewModel)
-            }
-
-            is Response.Failure -> {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text("Unexpected Error Occurred")
-                }
-
-            }
-        }
-
+        AddressesList()
         EmissionsGrid()
         SupplyDistribution()
         UsageContainer()
@@ -86,13 +55,44 @@ fun MetricsView(
 
 @Composable
 fun AddressesList(metricsViewModel: MetricsViewModel = hiltViewModel()) {
-    LazyRow(contentPadding = PaddingValues(8.dp)) {
-        items(metricsViewModel.summaryAddressesState.value) { summaryItems ->
-            MetricCard(
-                padding = PaddingValues(horizontal = 8.dp),
-                title = summaryItems.label,
-                cardDetails = summaryItems.dataSet
-            )
+    Heading("Addresses")
+    when (metricsViewModel.isSummaryAddressDataLoaded.value) {
+        is Response.Loading -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+
+        }
+
+        is Response.Success -> {
+            LazyRow(contentPadding = PaddingValues(8.dp)) {
+                items(metricsViewModel.summaryAddressesState.value) { summaryItems ->
+                    MetricCard(
+                        padding = PaddingValues(horizontal = 8.dp),
+                        title = summaryItems.title,
+                        subtitle = summaryItems.subtitle,
+                        value = summaryItems.value.toString(),
+                        cardDetails = summaryItems.dataSet
+                    )
+                }
+            }
+        }
+
+        is Response.Failure -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Unexpected Error Occurred")
+            }
+
         }
     }
 }
@@ -146,21 +146,90 @@ fun EmissionsGrid() {
 }
 
 @Composable
-fun SupplyDistribution() {
+fun SupplyDistribution(metricsViewModel: MetricsViewModel = hiltViewModel()) {
     Heading("Supply Distribution")
-    LazyRow(contentPadding = PaddingValues(8.dp)) {
-        items(5) {
-            MetricCard(padding = PaddingValues(horizontal = 8.dp), title = "test")
+    when (metricsViewModel.isSupplyDataLoaded.value) {
+        is Response.Loading -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+
+        }
+
+        is Response.Success -> {
+            LazyRow(contentPadding = PaddingValues(8.dp)) {
+                items(metricsViewModel.supplyDataState.value) { supplyDistribution ->
+                    MetricCard(
+                        padding = PaddingValues(horizontal = 8.dp),
+                        title = supplyDistribution.title,
+                        subtitle = supplyDistribution.subtitle,
+                        value = supplyDistribution.value.toString(),
+                        cardDetails = supplyDistribution.dataSet
+                    )
+                }
+            }
+        }
+
+        is Response.Failure -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Unexpected Error Occurred")
+            }
+
         }
     }
 }
 
 @Composable
-fun UsageContainer() {
+fun UsageContainer(metricsViewModel: MetricsViewModel = hiltViewModel()) {
     Heading("Usage")
-    LazyRow(contentPadding = PaddingValues(8.dp)) {
-        items(5) {
-            MetricCard(padding = PaddingValues(horizontal = 8.dp), title = "test 2")
+    when (metricsViewModel.isUsageDataLoaded.value) {
+        is Response.Loading -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                CircularProgressIndicator()
+            }
+
+        }
+
+        is Response.Success -> {
+            LazyRow(contentPadding = PaddingValues(8.dp)) {
+                items(metricsViewModel.usageDataState.value) { usageData ->
+
+                    MetricCard(
+                        padding = PaddingValues(horizontal = 8.dp),
+                        title = usageData.title,
+                        value = usageData.value.toString(),
+                        subtitle = usageData.subtitle,
+                        cardDetails = usageData.dataSet,
+                    )
+                }
+            }
+        }
+
+        is Response.Failure -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text("Unexpected Error Occurred")
+            }
+
         }
     }
 }

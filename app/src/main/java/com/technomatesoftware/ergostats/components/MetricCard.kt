@@ -26,10 +26,11 @@ import java.util.Locale
 fun MetricCard(
     padding: PaddingValues,
     title: String,
+    subtitle: String?,
+    value: String?,
     cardDetails: List<SummaryMetricsModel>? = emptyList()
 ) {
-    val description = if(!cardDetails.isNullOrEmpty()) cardDetails.first().label else EMPTY_STRING
-    val value = if(!cardDetails.isNullOrEmpty()) cardDetails.first().current.toString() else EMPTY_STRING
+
 
     Card(
         shape = RoundedCornerShape(20.dp),
@@ -45,10 +46,12 @@ fun MetricCard(
             verticalArrangement = Arrangement.Bottom,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(8.dp)
+                .padding(horizontal = 16.dp)
+                .padding(vertical = 8.dp)
         ) {
             Text(title.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
-            Text("$description: $value", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text(value ?: EMPTY_STRING, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text(subtitle ?: EMPTY_STRING, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 
@@ -57,7 +60,7 @@ fun MetricCard(
 @Preview(showBackground = true)
 @Composable
 fun MetricCardPreview() {
-    MetricCard(PaddingValues(8.dp), "Test")
+    MetricCard(PaddingValues(8.dp), "Test","Test2", "7123.3")
 }
 
 

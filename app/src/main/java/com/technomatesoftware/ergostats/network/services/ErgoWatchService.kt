@@ -1,6 +1,7 @@
 package com.technomatesoftware.ergostats.network.services
 
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
+import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
 import retrofit2.http.GET
 
 interface ErgoWatchService {
@@ -21,4 +22,10 @@ interface ErgoWatchService {
 
     @GET("metrics/summary/addresses/p2pk")
     suspend fun fetchSummaryP2pk(): List<SummaryMetricsModel>
+
+    @GET("metrics/summary/supply/distribution/p2pk")
+    suspend fun fetchSupplyDistributionP2pk(): SupplyDistributionModel
+
+    @GET("metrics/summary/supply/distribution/contracts")
+    suspend fun fetchSupplyDistributionContracts(): SupplyDistributionModel
 }

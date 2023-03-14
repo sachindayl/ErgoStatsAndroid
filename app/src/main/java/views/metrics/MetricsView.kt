@@ -1,17 +1,21 @@
 package views.metrics
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,12 +26,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.technomatesoftware.ergostats.components.Heading
 import com.technomatesoftware.ergostats.components.MetricCard
 import com.technomatesoftware.ergostats.components.MetricCircle
+import com.technomatesoftware.ergostats.domain.models.Response
+import com.technomatesoftware.ergostats.viewmodel.MetricsViewModel
 
 @Composable
 fun MetricsView(
+    metricsViewModel: MetricsViewModel = hiltViewModel(),
     padding: PaddingValues
 ) {
     Column(
@@ -39,68 +47,122 @@ fun MetricsView(
 
     ) {
         Heading("Addresses")
-        LazyRow(contentPadding = PaddingValues(8.dp)) {
-            items(5) {
-                MetricCard(padding = PaddingValues(horizontal = 8.dp))
-            }
-        }
-
-        Card(modifier = Modifier.padding(16.dp)) {
-            LazyVerticalGrid(
-                verticalArrangement = Arrangement.Center,
-                horizontalArrangement = Arrangement.Center,
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .height(200.dp).fillMaxSize()
-            ) {
-                item {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            "Emission",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        MetricCircle()
-                    }
-
+        when (metricsViewModel.isSummaryAddressDataLoaded.value) {
+            is Response.Loading -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    CircularProgressIndicator()
                 }
-                item {
-                    Column(Modifier.fillMaxSize().padding(4.dp), verticalArrangement = Arrangement.Center) {
-                        Text(text = "Max Supply", fontSize = 16.sp)
-                        Text(
-                            text = "33.45 Erg",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        Text(text = "Circulating Supply", fontSize = 16.sp)
-                        Text(
-                            text = "323,546,464 Erg",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+
+            }
+
+            is Response.Success -> {
+                AddressesList(metricsViewModel)
+            }
+
+            is Response.Failure -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text("Unexpected Error Occurred")
                 }
+
             }
         }
 
+        EmissionsGrid()
+        SupplyDistribution()
+        UsageContainer()
+    }
 
+}
 
-        Heading("Supply Distribution")
-        LazyRow(contentPadding = PaddingValues(8.dp)) {
-            items(5) {
-                MetricCard(padding = PaddingValues(horizontal = 8.dp))
-            }
+@Composable
+fun AddressesList(metricsViewModel: MetricsViewModel = hiltViewModel()) {
+    LazyRow(contentPadding = PaddingValues(8.dp)) {
+        items(metricsViewModel.summaryAddressesState.value) { summaryItems ->
+            MetricCard(
+                padding = PaddingValues(horizontal = 8.dp),
+                title = summaryItems.label,
+                cardDetails = summaryItems.dataSet
+            )
         }
-        Heading("Usage")
-        LazyRow(contentPadding = PaddingValues(8.dp)) {
-            items(5) {
-                MetricCard(padding = PaddingValues(horizontal = 8.dp))
+    }
+}
+
+@Composable
+fun EmissionsGrid() {
+    Card(modifier = Modifier.padding(16.dp)) {
+        LazyVerticalGrid(
+            verticalArrangement = Arrangement.Center,
+            horizontalArrangement = Arrangement.Center,
+            columns = GridCells.Fixed(2),
+            modifier = Modifier
+                .height(200.dp)
+                .fillMaxSize()
+        ) {
+            item {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        "Emission",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
+                    MetricCircle()
+                }
+
+            }
+            item {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .padding(4.dp), verticalArrangement = Arrangement.Center
+                ) {
+                    Text(text = "Max Supply", fontSize = 16.sp)
+                    Text(
+                        text = "33.45 Erg",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(text = "Circulating Supply", fontSize = 16.sp)
+                    Text(
+                        text = "323,546,464 Erg",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }
+}
 
+@Composable
+fun SupplyDistribution() {
+    Heading("Supply Distribution")
+    LazyRow(contentPadding = PaddingValues(8.dp)) {
+        items(5) {
+            MetricCard(padding = PaddingValues(horizontal = 8.dp), title = "test")
+        }
+    }
+}
+
+@Composable
+fun UsageContainer() {
+    Heading("Usage")
+    LazyRow(contentPadding = PaddingValues(8.dp)) {
+        items(5) {
+            MetricCard(padding = PaddingValues(horizontal = 8.dp), title = "test 2")
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

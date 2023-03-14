@@ -18,23 +18,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.technomatesoftware.ergostats.config.EMPTY_STRING
+import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
+import java.util.Locale
 
 @Composable
-fun MetricCard(padding: PaddingValues) {
+fun MetricCard(
+    padding: PaddingValues,
+    title: String,
+    cardDetails: List<SummaryMetricsModel>? = emptyList()
+) {
+    val description = if(!cardDetails.isNullOrEmpty()) cardDetails.first().label else EMPTY_STRING
+    val value = if(!cardDetails.isNullOrEmpty()) cardDetails.first().current.toString() else EMPTY_STRING
+
     Card(
-        shape= RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.primary,
         ),
         modifier = Modifier
             .height(100.dp)
-            .width(200.dp).padding(padding)) {
+            .width(200.dp)
+            .padding(padding)
+    ) {
         Column(
             verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxSize().padding(8.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
         ) {
-            Text("Volume")
-            Text("25,000", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text(title.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
+            Text("$description: $value", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 
@@ -43,7 +57,7 @@ fun MetricCard(padding: PaddingValues) {
 @Preview(showBackground = true)
 @Composable
 fun MetricCardPreview() {
-    MetricCard(PaddingValues(8.dp))
+    MetricCard(PaddingValues(8.dp), "Test")
 }
 
 

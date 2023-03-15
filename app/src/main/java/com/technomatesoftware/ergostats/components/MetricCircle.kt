@@ -15,21 +15,27 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.technomatesoftware.ergostats.config.NumberFormatter
 
 @Composable
-fun MetricCircle() {
-
+fun MetricCircle(percentage: Double?) {
+    val numberFormatter = NumberFormatter()
     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(
-                progress = 0.8f,
-                strokeWidth= 8.dp,
+                progress = percentage?.toFloat() ?: 0.0f,
+                strokeWidth = 8.dp,
                 modifier = Modifier
                     .width(100.dp)
                     .height(100.dp),
             )
         }
-        Text("26.5", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
+        Text(
+            numberFormatter.toPercentWithDecimals(percentage?.times(100), 1),
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp
+        )
     }
 
 }
@@ -37,5 +43,5 @@ fun MetricCircle() {
 @Preview
 @Composable
 fun MetricCirclePreview() {
-    MetricCircle()
+    MetricCircle(0.23)
 }

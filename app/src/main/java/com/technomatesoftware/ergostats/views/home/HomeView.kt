@@ -1,4 +1,4 @@
-package views.home
+package com.technomatesoftware.ergostats.views.home
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -92,7 +92,7 @@ fun HomeView(
                             .padding(16.dp)
                     )
 
-                    Heading("Summary")
+                    Heading(PaddingValues(horizontal = 16.dp),"Summary")
 
                     Card(
                         modifier = Modifier

@@ -1,4 +1,4 @@
-package views.richlist
+package com.technomatesoftware.ergostats.views.richlist
 
 import android.content.Intent
 import androidx.compose.foundation.clickable

@@ -8,7 +8,7 @@ import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntry
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
+import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartAxisModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartEntryModel
@@ -44,7 +44,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun coinMarketData() {
+    private fun coinMarketData() {
         viewModelScope.launch {
             coinGeckoRepository.getCoinMarketData().collect { response ->
                 _coinGeckoState.value = response
@@ -62,31 +62,9 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getCoinMarketChartData() {
+    private fun getCoinMarketChartData() {
         viewModelScope.launch {
             coinGeckoRepository.getCoinMarketPriceChartData().collect { response ->
-//                val chartEntryModelProducer = listOf(
-//                    "2022-07-14" to 2f,
-//                    "2022-07-15" to 4f,
-//                    "2022-07-17" to 2f,
-//                    "2022-08-01" to 8f,
-//                ).mapIndexed { index, (dateString, y) -> Entry(LocalDate.parse(dateString), index.toFloat(), y) }
-//                    .let { ChartEntryModelProducer(it) }
-//
-//                val axisValueFormatter = AxisValueFormatter<AxisPosition.Horizontal> { value, chartValues ->
-//                    (chartValues.chartEntryModel.entries.first().getOrNull(value.toInt()) as? Entry)
-//                        ?.localDate
-//                        ?.run { "$dayOfMonth/$monthValue" }
-//                        .orEmpty()
-
-//                val originalList = listOf("item1", "item2", "item3", "item4", "item5", "item6", "item7", "item8", "item9", "item10",
-//                    "item11", "item12", "item13", "item14", "item15", "item16", "item17", "item18", "item19", "item20",
-//                    "item21", "item22", "item23", "item24", "item25", "item26", "item27", "item28", "item29", "item30")
-//
-//                val every7thItem = originalList.filterIndexed { index, _ -> (index + 1) % 7 == 0 }
-//
-//                println(every7thItem)
-
 
                 when (response) {
                     is Response.Success -> {

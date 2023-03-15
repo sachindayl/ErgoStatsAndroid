@@ -1,7 +1,7 @@
 package com.technomatesoftware.ergostats.network.repository
 
 import android.util.Log
-import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
+import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
 import com.technomatesoftware.ergostats.domain.models.CoinMarketPriceChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response

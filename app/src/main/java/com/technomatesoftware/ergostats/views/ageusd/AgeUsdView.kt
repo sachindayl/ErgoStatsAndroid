@@ -1,4 +1,4 @@
-package views.ageusd
+package com.technomatesoftware.ergostats.views.ageusd
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

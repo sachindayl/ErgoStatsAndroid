@@ -15,26 +15,44 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.technomatesoftware.ergostats.config.EMPTY_STRING
+import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
+import java.util.Locale
 
 @Composable
-fun MetricCard(padding: PaddingValues) {
+fun MetricCard(
+    padding: PaddingValues,
+    title: String,
+    subtitle: String?,
+    value: String?,
+    cardDetails: List<SummaryMetricsModel>? = emptyList()
+) {
+
+
     Card(
-        shape= RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor =  MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.primary,
         ),
         modifier = Modifier
             .height(100.dp)
-            .width(200.dp).padding(padding)) {
+            .width(200.dp)
+            .padding(padding)
+    ) {
         Column(
-            verticalArrangement = Arrangement.Bottom,
-            modifier = Modifier.fillMaxSize().padding(8.dp)
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .padding(vertical = 8.dp)
         ) {
-            Text("Volume")
-            Text("25,000", fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text(title.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
+            Text(value ?: EMPTY_STRING, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(subtitle ?: EMPTY_STRING, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 
@@ -43,7 +61,7 @@ fun MetricCard(padding: PaddingValues) {
 @Preview(showBackground = true)
 @Composable
 fun MetricCardPreview() {
-    MetricCard(PaddingValues(8.dp))
+    MetricCard(PaddingValues(8.dp), "Test","Test2", "7123.3")
 }
 
 

@@ -1,4 +1,4 @@
-package views.metrics
+package com.technomatesoftware.ergostats.views.metrics
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,11 +30,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.technomatesoftware.ergostats.components.Heading
 import com.technomatesoftware.ergostats.components.MetricCard
 import com.technomatesoftware.ergostats.components.MetricCircle
+import com.technomatesoftware.ergostats.config.EMPTY_STRING
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.viewmodel.MetricsViewModel
 
 @Composable
 fun MetricsView(
+    metricsViewModel: MetricsViewModel = hiltViewModel(),
     padding: PaddingValues
 ) {
     Column(
@@ -45,17 +47,17 @@ fun MetricsView(
         horizontalAlignment = Alignment.Start
 
     ) {
-        AddressesList()
-        EmissionsGrid()
-        SupplyDistribution()
-        UsageContainer()
+        AddressesList(metricsViewModel)
+        EmissionsGrid(metricsViewModel)
+        SupplyDistribution(metricsViewModel)
+        UsageContainer(metricsViewModel)
     }
 
 }
 
 @Composable
-fun AddressesList(metricsViewModel: MetricsViewModel = hiltViewModel()) {
-    Heading("Addresses")
+fun AddressesList(metricsViewModel: MetricsViewModel) {
+    Heading(PaddingValues(horizontal = 16.dp, vertical = 8.dp), "Addresses")
     when (metricsViewModel.isSummaryAddressDataLoaded.value) {
         is Response.Loading -> {
             Box(
@@ -76,7 +78,7 @@ fun AddressesList(metricsViewModel: MetricsViewModel = hiltViewModel()) {
                         padding = PaddingValues(horizontal = 8.dp),
                         title = summaryItems.title,
                         subtitle = summaryItems.subtitle,
-                        value = summaryItems.value.toString(),
+                        value = summaryItems.value,
                         cardDetails = summaryItems.dataSet
                     )
                 }
@@ -98,47 +100,77 @@ fun AddressesList(metricsViewModel: MetricsViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun EmissionsGrid() {
-    Card(modifier = Modifier.padding(16.dp)) {
-        LazyVerticalGrid(
-            verticalArrangement = Arrangement.Center,
-            horizontalArrangement = Arrangement.Center,
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .height(200.dp)
-                .fillMaxSize()
-        ) {
-            item {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "Emission",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    MetricCircle()
-                }
+fun EmissionsGrid(metricsViewModel: MetricsViewModel) {
 
-            }
-            item {
-                Column(
-                    Modifier
-                        .fillMaxSize()
-                        .padding(4.dp), verticalArrangement = Arrangement.Center
+    Card(modifier = Modifier.padding(16.dp)) {
+        when (metricsViewModel.isCirculatingSupplyLoaded.value) {
+            is Response.Loading -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .padding(16.dp)
                 ) {
-                    Text(text = "Max Supply", fontSize = 16.sp)
-                    Text(
-                        text = "33.45 Erg",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Text(text = "Circulating Supply", fontSize = 16.sp)
-                    Text(
-                        text = "323,546,464 Erg",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    CircularProgressIndicator()
+                }
+            }
+
+            is Response.Success -> {
+                LazyVerticalGrid(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.Center,
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxSize()
+                ) {
+                    item {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(
+                                "Emission",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            MetricCircle(metricsViewModel.percentMinedState.value)
+                        }
+
+                    }
+                    item {
+                        Column(
+                            Modifier
+                                .fillMaxSize()
+                                .padding(4.dp), verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(text = "Max Supply", fontSize = 16.sp)
+                            Text(
+                                text = metricsViewModel.getTotalSupply(),
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Text(text = "Circulating Supply", fontSize = 16.sp)
+                            Text(
+                                text = metricsViewModel.circulatingSupplyState.value
+                                    ?: EMPTY_STRING,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+                }
+            }
+
+            is Response.Failure -> {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .height(200.dp)
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text("Unexpected Error Occurred")
                 }
             }
         }
@@ -146,8 +178,8 @@ fun EmissionsGrid() {
 }
 
 @Composable
-fun SupplyDistribution(metricsViewModel: MetricsViewModel = hiltViewModel()) {
-    Heading("Supply Distribution")
+fun SupplyDistribution(metricsViewModel: MetricsViewModel) {
+    Heading(PaddingValues(horizontal = 16.dp, vertical = 8.dp), "Supply Distribution")
     when (metricsViewModel.isSupplyDataLoaded.value) {
         is Response.Loading -> {
             Box(
@@ -168,7 +200,7 @@ fun SupplyDistribution(metricsViewModel: MetricsViewModel = hiltViewModel()) {
                         padding = PaddingValues(horizontal = 8.dp),
                         title = supplyDistribution.title,
                         subtitle = supplyDistribution.subtitle,
-                        value = supplyDistribution.value.toString(),
+                        value = supplyDistribution.value,
                         cardDetails = supplyDistribution.dataSet
                     )
                 }
@@ -190,8 +222,8 @@ fun SupplyDistribution(metricsViewModel: MetricsViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun UsageContainer(metricsViewModel: MetricsViewModel = hiltViewModel()) {
-    Heading("Usage")
+fun UsageContainer(metricsViewModel: MetricsViewModel) {
+    Heading(PaddingValues(horizontal = 16.dp, vertical = 8.dp), "Usage")
     when (metricsViewModel.isUsageDataLoaded.value) {
         is Response.Loading -> {
             Box(
@@ -212,7 +244,7 @@ fun UsageContainer(metricsViewModel: MetricsViewModel = hiltViewModel()) {
                     MetricCard(
                         padding = PaddingValues(horizontal = 8.dp),
                         title = usageData.title,
-                        value = usageData.value.toString(),
+                        value = usageData.value,
                         subtitle = usageData.subtitle,
                         cardDetails = usageData.dataSet,
                     )

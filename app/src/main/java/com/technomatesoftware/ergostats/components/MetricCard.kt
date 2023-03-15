@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,14 +44,14 @@ fun MetricCard(
             .padding(padding)
     ) {
         Column(
-            verticalArrangement = Arrangement.Bottom,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .padding(vertical = 8.dp)
         ) {
             Text(title.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() })
-            Text(value ?: EMPTY_STRING, fontSize = 24.sp, fontWeight = FontWeight.SemiBold)
+            Text(value ?: EMPTY_STRING, fontSize = 24.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(subtitle ?: EMPTY_STRING, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
     }

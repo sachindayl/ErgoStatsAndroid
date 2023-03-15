@@ -8,7 +8,7 @@ import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntry
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
+import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartAxisModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartEntryModel

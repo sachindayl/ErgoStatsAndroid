@@ -1,8 +1,10 @@
 package com.technomatesoftware.ergostats.modules
 
-import com.technomatesoftware.ergostats.domain.interfaces.CoinGeckoRepository
-import com.technomatesoftware.ergostats.domain.interfaces.ErgoWatchRepository
+import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
+import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
+import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
 import com.technomatesoftware.ergostats.network.repository.CoinGeckoRepositoryImpl
+import com.technomatesoftware.ergostats.network.repository.ErgoPlatformRepositoryImpl
 import com.technomatesoftware.ergostats.network.repository.ErgoWatchRepositoryImpl
 import com.technomatesoftware.ergostats.network.services.CoinGeckoService
 import com.technomatesoftware.ergostats.network.services.ErgoPlatformService
@@ -118,5 +120,12 @@ class AppModule {
         ergoWatchService: ErgoWatchService,
     ): ErgoWatchRepository = ErgoWatchRepositoryImpl(
         ergoWatchService
+    )
+
+    @Provides
+    fun provideErgoPlatformRepository(
+        ergoPlatformService: ErgoPlatformService,
+    ): ErgoPlatformRepository = ErgoPlatformRepositoryImpl(
+        ergoPlatformService
     )
 }

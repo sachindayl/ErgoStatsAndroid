@@ -1,5 +1,6 @@
 package com.technomatesoftware.ergostats.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -11,14 +12,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun Heading(title: String?) {
+fun Heading(paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp), title: String?) {
     title?.let {
         Text(
             it,
-            fontSize = 30.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(paddingValues)
         )
     }
 }
@@ -26,5 +27,5 @@ fun Heading(title: String?) {
 @Preview
 @Composable
 fun HeadingPreview() {
-    Heading(title = "Testing")
+    Heading(paddingValues = PaddingValues(horizontal = 16.dp), title = "Testing")
 }

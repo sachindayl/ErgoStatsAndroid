@@ -1,4 +1,4 @@
-package com.technomatesoftware.ergostats.domain.interfaces
+package com.technomatesoftware.ergostats.network.interfaces
 
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel

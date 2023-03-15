@@ -1,4 +1,4 @@
-package views.rank
+package com.technomatesoftware.ergostats.views.rank
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

@@ -16,11 +16,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.technomatesoftware.ergostats.components.BottomNavigationBar
 import com.technomatesoftware.ergostats.domain.models.Routes
-import views.ageusd.AgeUsdView
-import views.home.HomeView
-import views.metrics.MetricsView
-import views.rank.RankView
-import views.richlist.RichListView
+import com.technomatesoftware.ergostats.views.ageusd.AgeUsdView
+import com.technomatesoftware.ergostats.views.home.HomeView
+import com.technomatesoftware.ergostats.views.metrics.MetricsView
+import com.technomatesoftware.ergostats.views.rank.RankView
+import com.technomatesoftware.ergostats.views.richlist.RichListView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

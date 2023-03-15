@@ -1,6 +1,6 @@
 package com.technomatesoftware.ergostats.network.repository
 
-import com.technomatesoftware.ergostats.domain.interfaces.ErgoWatchRepository
+import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel

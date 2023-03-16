@@ -20,29 +20,32 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.endAxis
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider
-import com.patrykandpatrick.vico.core.entry.ChartEntryModel
-import com.patrykandpatrick.vico.core.entry.ChartModelProducer
+import com.technomatesoftware.ergostats.components.CustomChart
 import com.technomatesoftware.ergostats.components.Heading
 import com.technomatesoftware.ergostats.components.SummaryItem
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.viewmodel.HomeViewModel
+import com.technomatesoftware.ergostats.viewmodel.MainViewModel
+import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 
 @Composable
 fun HomeView(
     homeViewModel: HomeViewModel = hiltViewModel(),
+    mainViewModel: MainViewModel = remember { MainViewModelSingleton.viewModel },
     padding: PaddingValues
 ) {
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        mainViewModel.setTitle("Ergo Stats")
+    }
 
     when (val coinStats = homeViewModel.coinGeckoState.value) {
         is Response.Loading -> {
@@ -70,29 +73,13 @@ fun HomeView(
             ) {
                 coinStats.data?.first()?.let {
 
-                    Chart(
-                        chart = lineChart(
-                            axisValuesOverrider = AxisValuesOverrider.adaptiveYValues(
-                                1f,
-                                round = false
-                            )
-                        ),
-                        chartModelProducer = homeViewModel.coinGeckoChartEntryState.value.chartEntryModelProducer as ChartModelProducer<ChartEntryModel>,
-                        endAxis = endAxis(
-                            maxLabelCount = 5,
-                        ),
-                        bottomAxis = homeViewModel.coinGeckoChartEntryState.value.bottomAxisValueFormatter?.let { formatter ->
-                            bottomAxis(
-                                valueFormatter = formatter,
-                            )
-                        },
-                        modifier = Modifier
-                            .height(350.dp)
-                            .padding(top = 16.dp)
-                            .padding(16.dp)
+                    CustomChart(
+                        chartData = homeViewModel.coinGeckoChartEntryState.value.chartEntryModelProducer,
+                        bottomAxisLabels = homeViewModel.coinGeckoChartEntryState.value.bottomAxisValueFormatter,
+                        height = 350.dp
                     )
 
-                    Heading(PaddingValues(horizontal = 16.dp),"Summary")
+                    Heading(PaddingValues(horizontal = 16.dp), "Summary")
 
                     Card(
                         modifier = Modifier

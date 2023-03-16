@@ -12,16 +12,21 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import com.technomatesoftware.ergostats.CustomWebView
 import com.technomatesoftware.ergostats.domain.models.RichModel
+import com.technomatesoftware.ergostats.viewmodel.MainViewModel
+import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RichListView(
-    padding: PaddingValues
+    padding: PaddingValues,
+    mainViewModel: MainViewModel = remember { MainViewModelSingleton.viewModel },
 ) {
     val context = LocalContext.current
     val richList = mutableListOf(
@@ -50,6 +55,10 @@ fun RichListView(
     )
     val listModifier = Modifier
         .padding(padding)
+
+    LaunchedEffect(Unit) {
+        mainViewModel.setTitle("Rich List")
+    }
 
     LazyColumn(modifier = listModifier,) {
         itemsIndexed(richList.toList()) {index, model ->

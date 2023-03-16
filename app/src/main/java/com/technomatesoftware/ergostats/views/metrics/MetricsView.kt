@@ -20,6 +20,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -27,18 +29,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.technomatesoftware.ergostats.components.Heading
 import com.technomatesoftware.ergostats.components.MetricCard
 import com.technomatesoftware.ergostats.components.MetricCircle
 import com.technomatesoftware.ergostats.config.EMPTY_STRING
 import com.technomatesoftware.ergostats.domain.models.Response
+import com.technomatesoftware.ergostats.domain.models.Routes
+import com.technomatesoftware.ergostats.viewmodel.MainViewModel
+import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 import com.technomatesoftware.ergostats.viewmodel.MetricsViewModel
 
 @Composable
 fun MetricsView(
+    padding: PaddingValues,
+    mainViewModel: MainViewModel = remember { MainViewModelSingleton.viewModel },
     metricsViewModel: MetricsViewModel = hiltViewModel(),
-    padding: PaddingValues
+    navController: NavController
 ) {
+
+    LaunchedEffect(Unit) {
+        mainViewModel.setTitle("Metrics")
+    }
+
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -47,16 +61,20 @@ fun MetricsView(
         horizontalAlignment = Alignment.Start
 
     ) {
-        AddressesList(metricsViewModel)
+        AddressesList(mainViewModel, metricsViewModel, navController)
         EmissionsGrid(metricsViewModel)
-        SupplyDistribution(metricsViewModel)
-        UsageContainer(metricsViewModel)
+        SupplyDistribution(metricsViewModel, navController)
+        UsageContainer(metricsViewModel, navController)
     }
 
 }
 
 @Composable
-fun AddressesList(metricsViewModel: MetricsViewModel) {
+fun AddressesList(
+    mainViewModel: MainViewModel,
+    metricsViewModel: MetricsViewModel,
+    navController: NavController
+) {
     Heading(PaddingValues(horizontal = 16.dp, vertical = 8.dp), "Addresses")
     when (metricsViewModel.isSummaryAddressDataLoaded.value) {
         is Response.Loading -> {
@@ -79,7 +97,11 @@ fun AddressesList(metricsViewModel: MetricsViewModel) {
                         title = summaryItems.title,
                         subtitle = summaryItems.subtitle,
                         value = summaryItems.value,
-                        cardDetails = summaryItems.dataSet
+                        cardDetails = summaryItems.dataSet,
+                        onClick = {
+                            mainViewModel.setTitle("Metrics Details")
+                            navController.navigate(Routes.METRICS_DETAILS.value)
+                        }
                     )
                 }
             }
@@ -178,7 +200,7 @@ fun EmissionsGrid(metricsViewModel: MetricsViewModel) {
 }
 
 @Composable
-fun SupplyDistribution(metricsViewModel: MetricsViewModel) {
+fun SupplyDistribution(metricsViewModel: MetricsViewModel, navController: NavController) {
     Heading(PaddingValues(horizontal = 16.dp, vertical = 8.dp), "Supply Distribution")
     when (metricsViewModel.isSupplyDataLoaded.value) {
         is Response.Loading -> {
@@ -201,7 +223,8 @@ fun SupplyDistribution(metricsViewModel: MetricsViewModel) {
                         title = supplyDistribution.title,
                         subtitle = supplyDistribution.subtitle,
                         value = supplyDistribution.value,
-                        cardDetails = supplyDistribution.dataSet
+                        cardDetails = supplyDistribution.dataSet,
+                        onClick = { navController.navigate(Routes.METRICS_DETAILS.value) }
                     )
                 }
             }
@@ -222,7 +245,7 @@ fun SupplyDistribution(metricsViewModel: MetricsViewModel) {
 }
 
 @Composable
-fun UsageContainer(metricsViewModel: MetricsViewModel) {
+fun UsageContainer(metricsViewModel: MetricsViewModel, navController: NavController) {
     Heading(PaddingValues(horizontal = 16.dp, vertical = 8.dp), "Usage")
     when (metricsViewModel.isUsageDataLoaded.value) {
         is Response.Loading -> {
@@ -247,6 +270,7 @@ fun UsageContainer(metricsViewModel: MetricsViewModel) {
                         value = usageData.value,
                         subtitle = usageData.subtitle,
                         cardDetails = usageData.dataSet,
+                        onClick = { navController.navigate(Routes.METRICS_DETAILS.value) }
                     )
                 }
             }
@@ -271,6 +295,6 @@ fun UsageContainer(metricsViewModel: MetricsViewModel) {
 @Composable
 fun PreviewSearchView() {
     Scaffold { padding ->
-        MetricsView(padding = padding)
+        MetricsView(padding = padding, navController = rememberNavController())
     }
 }

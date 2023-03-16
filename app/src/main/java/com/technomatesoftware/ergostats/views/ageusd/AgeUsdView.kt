@@ -37,6 +37,7 @@ fun AgeUsdView(
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Age USD")
         mainViewModel.setHideBottomNavBar(false)
+        mainViewModel.setEnableBackButton(false)
     }
 
     Column(

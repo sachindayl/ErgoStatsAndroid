@@ -23,6 +23,7 @@ fun MetricsDetailsView(
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Detail View")
         mainViewModel.setHideBottomNavBar(true)
+        mainViewModel.setEnableBackButton(true)
     }
 
     Column(Modifier.padding(padding)) {

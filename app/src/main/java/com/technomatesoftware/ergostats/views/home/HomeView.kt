@@ -46,6 +46,7 @@ fun HomeView(
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Ergo Stats")
         mainViewModel.setHideBottomNavBar(false)
+        mainViewModel.setEnableBackButton(false)
     }
 
     when (val coinStats = homeViewModel.coinGeckoState.value) {

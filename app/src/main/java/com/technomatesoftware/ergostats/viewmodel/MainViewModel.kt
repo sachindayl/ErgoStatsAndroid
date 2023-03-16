@@ -17,6 +17,10 @@ class MainViewModel : ViewModel() {
     fun setHideBottomNavBar(isHidden: Boolean) {
         _viewState.value = _viewState.value.copy(hideBottomNavBar = isHidden)
     }
+
+    fun setEnableBackButton(isEnabled: Boolean) {
+        _viewState.value = _viewState.value.copy(enableBackButton = isEnabled)
+    }
 }
 
 object MainViewModelSingleton {

@@ -58,6 +58,7 @@ fun RichListView(
 
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Rich List")
+        mainViewModel.setHideBottomNavBar(false)
     }
 
     LazyColumn(modifier = listModifier,) {

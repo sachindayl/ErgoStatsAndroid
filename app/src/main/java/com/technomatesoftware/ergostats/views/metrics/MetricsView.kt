@@ -51,6 +51,7 @@ fun MetricsView(
 
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Metrics")
+        mainViewModel.setHideBottomNavBar(false)
     }
 
     Column(

@@ -13,6 +13,10 @@ class MainViewModel : ViewModel() {
     fun setTitle(title: String) {
         _viewState.value = _viewState.value.copy(appBarTitle = title)
     }
+
+    fun setHideBottomNavBar(isHidden: Boolean) {
+        _viewState.value = _viewState.value.copy(hideBottomNavBar = isHidden)
+    }
 }
 
 object MainViewModelSingleton {

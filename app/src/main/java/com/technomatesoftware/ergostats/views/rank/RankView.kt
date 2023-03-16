@@ -50,6 +50,7 @@ fun RankView(
 
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Rank")
+        mainViewModel.setHideBottomNavBar(false)
     }
 
     Column(

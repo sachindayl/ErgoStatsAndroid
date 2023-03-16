@@ -36,6 +36,7 @@ fun NavGraph(
     val mainViewModel = remember { MainViewModelSingleton.viewModel }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val currentState: State<MainViewState> = mainViewModel.viewState.collectAsState()
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -49,21 +50,33 @@ fun NavGraph(
                 modifier = Modifier.fillMaxWidth()
             )
         },
-        bottomBar = { BottomNavigationBar(navController = navController) }) { padding ->
+        bottomBar = {
+            if (!currentState.value.hideBottomNavBar) {
+                BottomNavigationBar(navController = navController)
+            }
+        }) { padding ->
         NavHost(
             navController = navController,
             startDestination = Routes.HOME.value,
         ) {
-            composable(Routes.HOME.value) { HomeView(padding = padding) }
+            composable(Routes.HOME.value) {
+                HomeView(padding = padding)
+            }
             composable(Routes.METRICS.value) {
                 MetricsView(
                     padding = padding,
                     navController = navController
                 )
             }
-            composable(Routes.RANK.value) { RankView(padding = padding) }
-            composable(Routes.RICH_LIST.value) { RichListView(padding = padding) }
-            composable(Routes.AGE_USD.value) { AgeUsdView(padding = padding) }
+            composable(Routes.RANK.value) {
+                RankView(padding = padding)
+            }
+            composable(Routes.RICH_LIST.value) {
+                RichListView(padding = padding)
+            }
+            composable(Routes.AGE_USD.value) {
+                AgeUsdView(padding = padding)
+            }
             composable(Routes.METRICS_DETAILS.value) {
                 MetricsDetailsView(
                     padding = padding,

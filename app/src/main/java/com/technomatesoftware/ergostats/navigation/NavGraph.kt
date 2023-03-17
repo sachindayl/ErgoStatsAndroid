@@ -90,10 +90,10 @@ fun NavGraph(
             composable(Routes.AGE_USD.value) {
                 AgeUsdView(padding = padding)
             }
-            composable(Routes.METRICS_DETAILS.value) {
+            composable("${Routes.METRICS_DETAILS.value}/{metricId}") { backStackEntry ->
                 MetricsDetailsView(
                     padding = padding,
-                    navController = navController
+                    metricId = backStackEntry.arguments?.getInt("metricId")
                 )
             }
         }

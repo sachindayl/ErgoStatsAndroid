@@ -51,7 +51,7 @@ class HomeViewModel @Inject constructor(
 
                 when (storedData) {
                     is Response.Success -> {
-                        if(storedData.data?.isNotEmpty() == true) {
+                        if (storedData.data?.isNotEmpty() == true) {
                             Log.d("coinMarketData", "data collected from db")
                             _coinGeckoState.value = storedData
                         }
@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
                                 is Response.Success -> {
                                     Log.d("coinMarketData", "data collected from web")
                                     _coinGeckoState.value = response
-                                    coinGeckoRepository.storeCoinMarketData(
+                                    coinGeckoRepository.replaceCoinMarketData(
                                         response.data ?: emptyList()
                                     )
                                     Log.d("coinMarketData", "data stored")

@@ -86,8 +86,9 @@ class CoinGeckoRepositoryImpl @Inject constructor(
 
         }.flowOn(Dispatchers.IO)
 
-    override suspend fun storeCoinMarketData(coinMarketDataList: List<CoinMarketDataModel>) {
+    override suspend fun replaceCoinMarketData(coinMarketDataList: List<CoinMarketDataModel>) {
         val item = coinMarketDataList.first()
+        coinGeckoDao.clearCoinMarketData()
         coinGeckoDao.insertCoinMarketData(item.toCoinMarketDataEntity())
     }
 

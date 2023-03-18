@@ -12,7 +12,7 @@ import com.technomatesoftware.ergostats.domain.entities.MarketChartDataEntity
 interface CoinGeckoDao {
 
     @Query("SELECT * FROM coin_market_data")
-    fun getCoinMarketDataAndSparkline(): List<CoinMarketDataEntity>
+    suspend fun getCoinMarketDataAndSparkline(): List<CoinMarketDataEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCoinMarketData(vararg coinMarketData: CoinMarketDataEntity)
@@ -21,8 +21,11 @@ interface CoinGeckoDao {
     suspend fun insertCoinMarketChartData(marketChartData: List<MarketChartDataEntity>)
 
     @Query("SELECT * FROM coin_market_chart_data")
-    fun getMarketChartData(): List<MarketChartDataEntity>
+    suspend fun getMarketChartData(): List<MarketChartDataEntity>
 
     @Delete
     fun delete(coinMarketData: CoinMarketDataEntity)
+
+    @Query("DELETE FROM coin_market_data")
+    suspend fun clearCoinMarketData()
 }

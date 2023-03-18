@@ -87,18 +87,21 @@ class CoinGeckoRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO)
 
     override suspend fun replaceCoinMarketData(coinMarketDataList: List<CoinMarketDataModel>) {
-        val item = coinMarketDataList.first()
-        coinGeckoDao.clearCoinMarketData()
-        coinGeckoDao.insertCoinMarketData(item.toCoinMarketDataEntity())
+        if(coinMarketDataList.isNotEmpty()) {
+            val item = coinMarketDataList.first()
+            coinGeckoDao.clearCoinMarketData()
+            coinGeckoDao.insertCoinMarketData(item.toCoinMarketDataEntity())
+        }
     }
 
     override suspend fun replaceMarketChartData(chartDataList: List<List<Double>>) {
-
-        val mappedDataList = chartDataList.map {
-            MarketChartDataEntity(date =it.first().toLong(), price = it[1])
-        }.toList()
-        coinGeckoDao.clearMarketChartData()
-        coinGeckoDao.insertCoinMarketChartData(marketChartData = mappedDataList)
+        if (chartDataList.isNotEmpty()) {
+            val mappedDataList = chartDataList.map {
+                MarketChartDataEntity(date = it.first().toLong(), price = it[1])
+            }.toList()
+            coinGeckoDao.clearMarketChartData()
+            coinGeckoDao.insertCoinMarketChartData(marketChartData = mappedDataList)
+        }
     }
 
     override suspend fun getStoredMarketChartData(): Flow<Response<List<List<Double>>>> =
@@ -132,7 +135,6 @@ class CoinGeckoRepositoryImpl @Inject constructor(
             }
 
         }.flowOn(Dispatchers.IO)
-
 
 
 }

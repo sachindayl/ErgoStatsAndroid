@@ -225,30 +225,37 @@ class MetricsViewModel @Inject constructor(
     private fun getUsageData() {
         viewModelScope.launch {
             val usageList: MutableList<SummaryAddressModel> = mutableListOf()
-            ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
-                when (response) {
+
+            ergoWatchRepository.fetchStoredSummaryUTXOS().collect { storedData ->
+                when (storedData) {
                     is Response.Loading -> {
                         _isUsageDataLoaded.value = Response.Loading
                     }
 
                     is Response.Success -> {
-                        usageList.add(
-                            0,
-                            SummaryAddressModel(
-                                id = MetricsRetrievalModel.USAGE_UTXO,
-                                title = "UTXOs",
-                                subtitle = "",
-                                response.data?.first()?.current?.toInt().toString(),
-                                response.data
+                        if (storedData.data?.isNotEmpty() == true) {
+                            usageList.add(
+                                0, SummaryAddressModel(
+                                    id = MetricsRetrievalModel.USAGE_UTXO,
+                                    title = "UTXOs",
+                                    subtitle = "",
+                                    storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
                             )
-                        )
+                        }
+
+                        fetchAndStoreSummaryUtxos(usageList)
                     }
 
                     is Response.Failure -> {
-                        _isUsageDataLoaded.value = Response.Failure(Exception(""))
+                        _isUsageDataLoaded.value =
+                            Response.Failure(Exception("Unexpected Error Occurred"))
                     }
                 }
             }
+
+
 
             ergoWatchRepository.fetchSummaryTransactions().collect { response ->
                 when (response) {
@@ -305,9 +312,40 @@ class MetricsViewModel @Inject constructor(
             }
 
             _usageDataState.value = usageList
+
+            //TODO move this to when loading data from db
             _isUsageDataLoaded.value = Response.Success(true)
         }
     }
+
+    private suspend fun fetchAndStoreSummaryUtxos(usageList: MutableList<SummaryAddressModel>) =
+        ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
+            when (response) {
+                is Response.Success -> {
+                    val index =
+                        usageList.indexOfFirst { it.id == MetricsRetrievalModel.USAGE_UTXO }
+                    if (index != -1) {
+                        usageList[index] = SummaryAddressModel(
+                            id = MetricsRetrievalModel.USAGE_UTXO,
+                            title = "UTXOs",
+                            subtitle = "",
+                            response.data?.first()?.current?.toInt().toString(),
+                            response.data
+                        )
+                    }
+                    ergoWatchRepository.replaceSummaryUTXOS(
+                        response.data ?: emptyList()
+                    )
+                }
+
+                is Response.Failure -> {
+                    _isUsageDataLoaded.value =
+                        Response.Failure(Exception("Unexpected Error Occurred"))
+                }
+
+                else -> {}
+            }
+        }
 
     private fun getCirculatingSupply() {
         viewModelScope.launch {

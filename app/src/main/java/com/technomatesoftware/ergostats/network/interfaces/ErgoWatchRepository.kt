@@ -14,4 +14,6 @@ interface ErgoWatchRepository {
     suspend fun fetchSummaryP2pk(): Flow<Response<List<SummaryMetricsModel>>>
     suspend fun fetchSupplyDistributionP2pk(): Flow<Response<SupplyDistributionModel>>
     suspend fun fetchSupplyDistributionContracts(): Flow<Response<SupplyDistributionModel>>
+    suspend fun replaceSummaryUTXOS(metrics: List<SummaryMetricsModel>)
+    suspend fun fetchStoredSummaryUTXOS(): Flow<Response<List<SummaryMetricsModel>>>
 }

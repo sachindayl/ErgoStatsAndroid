@@ -3,7 +3,9 @@ package com.technomatesoftware.ergostats.modules
 import android.content.Context
 import androidx.room.Room
 import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
+import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
 import com.technomatesoftware.ergostats.domain.database.CoinStatsDB
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_1_2
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
@@ -37,7 +39,9 @@ class AppModule {
         return Room.databaseBuilder(
             appContext,
             CoinStatsDB::class.java, "ergo-stats"
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides
@@ -128,6 +132,11 @@ class AppModule {
     }
 
     @Provides
+    fun provideErgoWatchDao(coinStatsDB: CoinStatsDB): ErgoWatchDao {
+        return coinStatsDB.ergoWatchDao()
+    }
+
+    @Provides
     fun provideCoinGeckoRepository(
         coinGeckoService: CoinGeckoService,
         coinGeckoDao: CoinGeckoDao
@@ -139,8 +148,10 @@ class AppModule {
     @Provides
     fun provideErgoWatchRepository(
         ergoWatchService: ErgoWatchService,
+        ergoWatchDao: ErgoWatchDao
     ): ErgoWatchRepository = ErgoWatchRepositoryImpl(
-        ergoWatchService
+        ergoWatchService,
+        ergoWatchDao
     )
 
     @Provides

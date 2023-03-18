@@ -1,6 +1,7 @@
 package com.technomatesoftware.ergostats.domain.models
 
 import com.google.gson.annotations.SerializedName
+import com.technomatesoftware.ergostats.domain.entities.CoinMarketDataEntity
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -50,8 +51,6 @@ data class CoinMarketDataModel(
     var roi: Double?,
     @SerializedName("last_updated")
     var lastUpdated: String?,
-    @SerializedName("sparkline_in_7d")
-    var sparklineIn7D: SparkLineModel?,
     @SerializedName("price_change_percentage_24h_in_currency")
     var priceChangePercentage24HInCurrency: Double?
 ) {
@@ -110,4 +109,38 @@ data class CoinMarketDataModel(
         }
         return "0.00"
     }
+
+    fun toCoinMarketDataEntity(): CoinMarketDataEntity {
+        return CoinMarketDataEntity(
+           coinId = id,
+            symbol = symbol,
+            name = name,
+            image = image,
+            currentPrice = currentPrice,
+            marketCap = marketCap,
+            marketCapRank = marketCapRank,
+            fullyDilutedValuation = fullyDilutedValuation,
+            totalVolume = totalVolume,
+            high24H = high24H,
+            low24H = low24H,
+            priceChange24H = priceChange24H,
+            priceChangePercentage24H = priceChangePercentage24H,
+            marketCapChange24H = marketCapChange24H,
+            marketCapChangePercentage24H = marketCapChangePercentage24H,
+            circulatingSupply = circulatingSupply,
+            totalSupply = totalSupply,
+            maxSupply = maxSupply,
+            ath = ath,
+            athChangePercentage = athChangePercentage,
+            athDate = athDate,
+            atl = atl,
+            atlChangePercentage = atlChangePercentage,
+            atlDate = atlDate,
+            lastUpdated = lastUpdated,
+            roi = roi,
+            priceChangePercentage24HInCurrency = priceChangePercentage24HInCurrency
+        )
+    }
+
+
 }

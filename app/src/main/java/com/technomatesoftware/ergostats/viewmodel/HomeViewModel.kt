@@ -1,5 +1,6 @@
 package com.technomatesoftware.ergostats.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -34,7 +35,7 @@ class HomeViewModel @Inject constructor(
     val coinGeckoChartEntryState: State<CustomChartEntryModel> = _coinGeckoChartEntryState
 
     init {
-       loadData()
+        loadData()
     }
 
     fun loadData() {
@@ -46,14 +47,28 @@ class HomeViewModel @Inject constructor(
 
     private fun coinMarketData() {
         viewModelScope.launch {
-            coinGeckoRepository.getCoinMarketData().collect { response ->
-                _coinGeckoState.value = response
+            coinGeckoRepository.getStoredCoinMarketData().collect { storedData ->
 
-                when (val coinGeckoStats = _coinGeckoState.value) {
+                when (storedData) {
                     is Response.Success -> {
-                        val pricesList = coinGeckoStats.data?.first()?.sparklineIn7D?.price
-                        val newEntries = ArrayList<Number>()
-                        pricesList?.let { newEntries.addAll(it) }
+                        if(storedData.data?.isNotEmpty() == true) {
+                            Log.d("coinMarketData", "data collected from db")
+                            _coinGeckoState.value = storedData
+                        }
+                        coinGeckoRepository.getCoinMarketData().collect { response ->
+                            when (response) {
+                                is Response.Success -> {
+                                    Log.d("coinMarketData", "data collected from web")
+                                    _coinGeckoState.value = response
+                                    coinGeckoRepository.storeCoinMarketData(
+                                        response.data ?: emptyList()
+                                    )
+                                    Log.d("coinMarketData", "data stored")
+                                }
+
+                                else -> {}
+                            }
+                        }
                     }
 
                     else -> {}
@@ -69,7 +84,7 @@ class HomeViewModel @Inject constructor(
                 when (response) {
                     is Response.Success -> {
                         val filteredList = response.data?.prices?.filterIndexed { index, _ ->
-                            index == response.data.prices.size -1 || (index + 1) % 7 == 0
+                            index == response.data.prices.size - 1 || (index + 1) % 7 == 0
                         }
 
                         val chartEntryModelProducer =

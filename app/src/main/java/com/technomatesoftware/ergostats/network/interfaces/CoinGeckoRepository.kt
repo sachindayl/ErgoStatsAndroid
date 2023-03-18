@@ -7,5 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CoinGeckoRepository {
     suspend fun getCoinMarketData(): Flow<Response<List<CoinMarketDataModel>>>
+    suspend fun getStoredCoinMarketData(): Flow<Response<List<CoinMarketDataModel>>>
+    suspend fun replaceCoinMarketData(coinMarketDataList: List<CoinMarketDataModel>)
     suspend fun getCoinMarketPriceChartData(): Flow<Response<CoinMarketPriceChartDataModel>>
 }

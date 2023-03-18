@@ -1,5 +1,9 @@
 package com.technomatesoftware.ergostats.modules
 
+import android.content.Context
+import androidx.room.Room
+import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
+import com.technomatesoftware.ergostats.domain.database.CoinStatsDB
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
@@ -13,6 +17,7 @@ import com.technomatesoftware.ergostats.network.services.TokenJayService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -25,6 +30,15 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
+    @Provides
+    @Singleton
+    fun provideCoinStatsDB(@ApplicationContext appContext: Context): CoinStatsDB {
+        return Room.databaseBuilder(
+            appContext,
+            CoinStatsDB::class.java, "ergo-stats"
+        ).build()
+    }
 
     @Provides
     @Singleton
@@ -109,10 +123,17 @@ class AppModule {
     ): TokenJayService = retrofit.create(TokenJayService::class.java)
 
     @Provides
+    fun provideCoinGeckoDao(coinStatsDB: CoinStatsDB): CoinGeckoDao {
+        return coinStatsDB.coinGeckoDao()
+    }
+
+    @Provides
     fun provideCoinGeckoRepository(
         coinGeckoService: CoinGeckoService,
+        coinGeckoDao: CoinGeckoDao
     ): CoinGeckoRepository = CoinGeckoRepositoryImpl(
         coinGeckoService,
+        coinGeckoDao
     )
 
     @Provides
@@ -128,4 +149,6 @@ class AppModule {
     ): ErgoPlatformRepository = ErgoPlatformRepositoryImpl(
         ergoPlatformService
     )
+
+
 }

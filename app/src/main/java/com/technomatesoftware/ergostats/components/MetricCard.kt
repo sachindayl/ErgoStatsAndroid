@@ -1,5 +1,6 @@
 package com.technomatesoftware.ergostats.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,10 +30,9 @@ fun MetricCard(
     title: String,
     subtitle: String?,
     value: String?,
-    cardDetails: List<SummaryMetricsModel>? = emptyList()
+    cardDetails: List<SummaryMetricsModel>? = emptyList(),
+    onClick: () -> Unit,
 ) {
-
-
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
@@ -42,6 +42,7 @@ fun MetricCard(
             .height(100.dp)
             .width(200.dp)
             .padding(padding)
+            .clickable(onClick = onClick)
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -61,7 +62,7 @@ fun MetricCard(
 @Preview(showBackground = true)
 @Composable
 fun MetricCardPreview() {
-    MetricCard(PaddingValues(8.dp), "Test","Test2", "7123.3")
+    MetricCard(PaddingValues(8.dp), "Test","Test2", "7123.3", onClick = {})
 }
 
 

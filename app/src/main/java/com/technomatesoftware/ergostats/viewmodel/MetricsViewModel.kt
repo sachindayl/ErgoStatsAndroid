@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.technomatesoftware.ergostats.config.EMPTY_STRING
 import com.technomatesoftware.ergostats.config.NumberFormatter
 import com.technomatesoftware.ergostats.config.TOTAL_ERGO_SUPPLY
+import com.technomatesoftware.ergostats.domain.models.MetricsRetrievalModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryAddressModel
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
@@ -40,14 +41,13 @@ class MetricsViewModel @Inject constructor(
     private val _percentMinedState =
         mutableStateOf<Double?>(0.0)
     val percentMinedState: State<Double?> = _percentMinedState
+
     private val _isSummaryAddressDataLoaded: MutableState<Response<Boolean>> =
         mutableStateOf(Response.Loading)
     val isSummaryAddressDataLoaded: State<Response<Boolean>> = _isSummaryAddressDataLoaded
-
     private val _isSupplyDataLoaded: MutableState<Response<Boolean>> =
         mutableStateOf(Response.Loading)
     val isSupplyDataLoaded: State<Response<Boolean>> = _isSupplyDataLoaded
-
     private val _isUsageDataLoaded: MutableState<Response<Boolean>> =
         mutableStateOf(Response.Loading)
     val isUsageDataLoaded: State<Response<Boolean>> = _isUsageDataLoaded
@@ -86,6 +86,7 @@ class MetricsViewModel @Inject constructor(
                         summaryAddressList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.ADDRESS_CONTRACTS,
                                 title = "Contracts",
                                 subtitle = "Total",
                                 value = response.data?.first()?.current?.toInt().toString(),
@@ -110,6 +111,7 @@ class MetricsViewModel @Inject constructor(
                         summaryAddressList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.ADDRESS_MINING,
                                 title = "Miners",
                                 subtitle = "Total",
                                 value = response.data?.first()?.current?.toInt().toString(),
@@ -134,6 +136,7 @@ class MetricsViewModel @Inject constructor(
                         summaryAddressList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.ADDRESS_P2PK,
                                 title = "P2PKs",
                                 subtitle = "Total",
                                 response.data?.first()?.current?.toInt().toString(),
@@ -168,6 +171,7 @@ class MetricsViewModel @Inject constructor(
                         supplyDistributionList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.SUPPLY_CONTRACTS,
                                 title = "Contracts",
                                 subtitle = "Top 1%",
                                 numberFormatter.toPercentWithDecimals(
@@ -196,6 +200,7 @@ class MetricsViewModel @Inject constructor(
                         supplyDistributionList.add(
                             0,
                             SummaryAddressModel(
+                                MetricsRetrievalModel.SUPPLY_P2PK,
                                 "P2PKs",
                                 "Top 1%",
                                 numberFormatter.toPercentWithDecimals(
@@ -230,6 +235,7 @@ class MetricsViewModel @Inject constructor(
                         usageList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.USAGE_UTXO,
                                 title = "UTXOs",
                                 subtitle = "",
                                 response.data?.first()?.current?.toInt().toString(),
@@ -254,6 +260,7 @@ class MetricsViewModel @Inject constructor(
                         usageList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.USAGE_TRANSACTIONS,
                                 title = "Transactions",
                                 subtitle = EMPTY_STRING,
                                 response.data?.first()?.current?.toInt().toString(),
@@ -278,6 +285,7 @@ class MetricsViewModel @Inject constructor(
                         usageList.add(
                             0,
                             SummaryAddressModel(
+                                id = MetricsRetrievalModel.USAGE_VOLUME,
                                 title = "Transfer Volume",
                                 subtitle = EMPTY_STRING,
                                 value = "${

@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.SavedStateHandle
 import com.technomatesoftware.ergostats.components.DataTable
 import com.technomatesoftware.ergostats.viewmodel.MainViewModel
 import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
@@ -38,7 +37,7 @@ fun MetricsDetailsView(
 
         DataTable(
             columnCount = 4,
-            data = metricData,
+            data = emptyList(),
             modifier = Modifier.verticalScroll(rememberScrollState()),
         )
     }
@@ -49,7 +48,8 @@ fun MetricsDetailsView(
 fun MetricsDetailsViewPreview() {
     MetricsDetailsView(
         padding = PaddingValues(horizontal = 16.dp),
-        MainViewModel(),
-        metricData = emptyList()
+        1,
+        hiltViewModel(),
+        hiltViewModel()
     )
 }

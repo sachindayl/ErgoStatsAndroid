@@ -28,4 +28,7 @@ interface CoinGeckoDao {
 
     @Query("DELETE FROM coin_market_data")
     suspend fun clearCoinMarketData()
+
+    @Query("DELETE FROM coin_market_chart_data")
+    suspend fun clearMarketChartData()
 }

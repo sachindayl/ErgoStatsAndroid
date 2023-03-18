@@ -9,11 +9,11 @@ import com.patrykandpatrick.vico.core.axis.AxisPosition
 import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntry
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
-import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartAxisModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartEntryModel
 import com.technomatesoftware.ergostats.domain.models.Response
+import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.math.RoundingMode
@@ -79,48 +79,45 @@ class HomeViewModel @Inject constructor(
 
     private fun getCoinMarketChartData() {
         viewModelScope.launch {
-            coinGeckoRepository.getCoinMarketPriceChartData().collect { response ->
 
-                when (response) {
+            coinGeckoRepository.getStoredMarketChartData().collect { storedData ->
+                when (storedData) {
                     is Response.Success -> {
-                        val filteredList = response.data?.prices?.filterIndexed { index, _ ->
-                            index == response.data.prices.size - 1 || (index + 1) % 7 == 0
+                        if (storedData.data?.isNotEmpty() == true) {
+                            Log.d("MarketChartData", "data collected from db")
+                            val filteredList = filterChartDataSet(storedData.data)
+                            _coinGeckoChartEntryState.value =
+                                CustomChartEntryModel(
+                                    produceChartEntryModel(filteredList),
+                                    buildChartBottomAxisValues(),
+                                    buildChartEndAxisValues()
+                                )
+                        }
+                        coinGeckoRepository.getCoinMarketPriceChartData().collect { response ->
+
+                            when (response) {
+                                is Response.Success -> {
+                                    Log.d("MarketChartData", "data collected from web")
+                                    val filteredList =
+                                        filterChartDataSet(response.data ?: emptyList())
+
+                                    _coinGeckoChartEntryState.value =
+                                        CustomChartEntryModel(
+                                            produceChartEntryModel(filteredList),
+                                            buildChartBottomAxisValues(),
+                                            buildChartEndAxisValues()
+                                        )
+
+                                    coinGeckoRepository.replaceMarketChartData(
+                                        response.data ?: emptyList()
+                                    )
+                                    Log.d("MarketChartData", "data stored on db")
+                                }
+
+                                else -> {}
+                            }
                         }
 
-                        val chartEntryModelProducer =
-                            filteredList?.mapIndexed { index, data ->
-                                val date = SimpleDateFormat("MMM d", Locale.getDefault()).format(
-                                    Date(data.first().toLong())
-                                )
-                                CustomChartAxisModel(
-                                    date,
-                                    index.toFloat(),
-                                    data[1].toFloat()
-                                )
-                            }.let { ChartEntryModelProducer(it as List<ChartEntry>) }
-
-                        val bottomAxisValueFormatter =
-                            AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, chartValues ->
-                                (chartValues.chartEntryModel.entries.first()
-                                    .getOrNull(value.toInt()) as? CustomChartAxisModel)?.formattedDate
-                                    .orEmpty()
-                            }
-
-                        val endAxisValueFormatter =
-                            AxisValueFormatter<AxisPosition.Vertical.End> { value, chartValues ->
-
-                                val roundedValue = (chartValues.chartEntryModel.entries.first()
-                                    .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toBigDecimal()
-                                    ?.setScale(2, RoundingMode.HALF_UP)
-                                roundedValue.toString()
-                            }
-
-                        _coinGeckoChartEntryState.value =
-                            CustomChartEntryModel(
-                                chartEntryModelProducer,
-                                bottomAxisValueFormatter,
-                                endAxisValueFormatter
-                            )
                     }
 
                     else -> {}
@@ -128,4 +125,38 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    private fun filterChartDataSet(
+        dataSet: List<List<Double>>,
+        numberOfDays: Int = 7
+    ): List<List<Double>> = dataSet.filterIndexed { index, _ ->
+        index == dataSet.size - 1 || (index + 1) % numberOfDays == 0
+    }
+
+    private fun produceChartEntryModel(dataSet: List<List<Double>>): ChartEntryModelProducer =
+        dataSet.mapIndexed { index, data ->
+            val date = SimpleDateFormat("MMM d", Locale.getDefault()).format(
+                Date(data.first().toLong())
+            )
+            CustomChartAxisModel(
+                date,
+                index.toFloat(),
+                data[1].toFloat()
+            )
+        }.let { ChartEntryModelProducer(it as List<ChartEntry>) }
+
+    private fun buildChartBottomAxisValues(): AxisValueFormatter<AxisPosition.Horizontal.Bottom> =
+        AxisValueFormatter { value, chartValues ->
+            (chartValues.chartEntryModel.entries.first()
+                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.formattedDate
+                .orEmpty()
+        }
+
+    private fun buildChartEndAxisValues(): AxisValueFormatter<AxisPosition.Vertical.End> =
+        AxisValueFormatter { value, chartValues ->
+            val roundedValue = (chartValues.chartEntryModel.entries.first()
+                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toBigDecimal()
+                ?.setScale(2, RoundingMode.HALF_UP)
+            roundedValue.toString()
+        }
 }

@@ -2,8 +2,8 @@ package com.technomatesoftware.ergostats.network.repository
 
 import android.util.Log
 import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
+import com.technomatesoftware.ergostats.domain.entities.MarketChartDataEntity
 import com.technomatesoftware.ergostats.domain.models.CoinMarketDataModel
-import com.technomatesoftware.ergostats.domain.models.CoinMarketPriceChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.services.CoinGeckoService
@@ -92,7 +92,31 @@ class CoinGeckoRepositoryImpl @Inject constructor(
         coinGeckoDao.insertCoinMarketData(item.toCoinMarketDataEntity())
     }
 
-    override suspend fun getCoinMarketPriceChartData(): Flow<Response<CoinMarketPriceChartDataModel>> =
+    override suspend fun replaceMarketChartData(chartDataList: List<List<Double>>) {
+
+        val mappedDataList = chartDataList.map {
+            MarketChartDataEntity(date =it.first().toLong(), price = it[1])
+        }.toList()
+        coinGeckoDao.clearMarketChartData()
+        coinGeckoDao.insertCoinMarketChartData(marketChartData = mappedDataList)
+    }
+
+    override suspend fun getStoredMarketChartData(): Flow<Response<List<List<Double>>>> =
+        flow {
+            try {
+                emit(Response.Loading)
+                val result = coinGeckoDao.getMarketChartData()
+                val mappedChartData = result.map { item ->
+                    listOf(item.date.toDouble(), item.price)
+                }.toList()
+                emit(Response.Success(mappedChartData))
+            } catch (e: Exception) {
+                Log.d("getCoinStoredMarketData", e.message.toString())
+                emit(Response.Failure(e))
+            }
+        }.flowOn(Dispatchers.IO)
+
+    override suspend fun getCoinMarketPriceChartData(): Flow<Response<List<List<Double>>>> =
         flow {
             try {
                 emit(Response.Loading)
@@ -101,13 +125,14 @@ class CoinGeckoRepositoryImpl @Inject constructor(
                     days = 30,
                     interval = "daily"
                 )
-                emit(Response.Success(result))
+                emit(Response.Success(result.prices))
             } catch (e: Exception) {
                 Log.d("getCoinMarketData", e.message.toString())
                 emit(Response.Failure(e))
             }
 
         }.flowOn(Dispatchers.IO)
+
 
 
 }

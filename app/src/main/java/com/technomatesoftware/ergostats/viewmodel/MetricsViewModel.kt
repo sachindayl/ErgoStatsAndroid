@@ -225,125 +225,185 @@ class MetricsViewModel @Inject constructor(
     private fun getUsageData() {
         viewModelScope.launch {
             val usageList: MutableList<SummaryAddressModel> = mutableListOf()
-
-            ergoWatchRepository.fetchStoredSummaryUTXOS().collect { storedData ->
-                when (storedData) {
-                    is Response.Loading -> {
-                        _isUsageDataLoaded.value = Response.Loading
-                    }
-
-                    is Response.Success -> {
-                        if (storedData.data?.isNotEmpty() == true) {
-                            usageList.add(
-                                0, SummaryAddressModel(
-                                    id = MetricsRetrievalModel.USAGE_UTXO,
-                                    title = "UTXOs",
-                                    subtitle = "",
-                                    storedData.data.first().current.toInt().toString(),
-                                    storedData.data
-                                )
-                            )
-                        }
-
-                        fetchAndStoreSummaryUtxos(usageList)
-                    }
-
-                    is Response.Failure -> {
-                        _isUsageDataLoaded.value =
-                            Response.Failure(Exception("Unexpected Error Occurred"))
-                    }
-                }
-            }
-
-
-
-            ergoWatchRepository.fetchSummaryTransactions().collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        _isUsageDataLoaded.value = Response.Loading
-                    }
-
-                    is Response.Success -> {
-                        usageList.add(
-                            0,
-                            SummaryAddressModel(
-                                id = MetricsRetrievalModel.USAGE_TRANSACTIONS,
-                                title = "Transactions",
-                                subtitle = EMPTY_STRING,
-                                response.data?.first()?.current?.toInt().toString(),
-                                response.data
-                            )
-                        )
-                    }
-
-                    is Response.Failure -> {
-                        _isUsageDataLoaded.value = Response.Failure(Exception(""))
-                    }
-                }
-            }
-
-            ergoWatchRepository.fetchSummaryVolume().collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        _isUsageDataLoaded.value = Response.Loading
-                    }
-
-                    is Response.Success -> {
-                        usageList.add(
-                            0,
-                            SummaryAddressModel(
-                                id = MetricsRetrievalModel.USAGE_VOLUME,
-                                title = "Transfer Volume",
-                                subtitle = EMPTY_STRING,
-                                value = "${
-                                    response.data?.first()?.current?.toDouble()?.div(1000000000)
-                                        ?.toBigDecimal()
-                                        ?.setScale(2, RoundingMode.HALF_UP)?.toInt()
-                                } ERG",
-                                dataSet = response.data
-                            )
-                        )
-                    }
-
-                    is Response.Failure -> {
-                        _isUsageDataLoaded.value = Response.Failure(Exception(""))
-                    }
-                }
-            }
-
-            _usageDataState.value = usageList
-
-            //TODO move this to when loading data from db
+            fetchAndStoreSummaryUTXOs(usageList)
+            fetchAndStoreSummaryTransactions(usageList)
+            fetchAndStoreSummaryVolume(usageList)
             _isUsageDataLoaded.value = Response.Success(true)
+            _usageDataState.value = usageList
         }
     }
 
-    private suspend fun fetchAndStoreSummaryUtxos(usageList: MutableList<SummaryAddressModel>) =
-        ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
-            when (response) {
+    private suspend fun fetchAndStoreSummaryUTXOs(usageList: MutableList<SummaryAddressModel>) =
+        ergoWatchRepository.fetchStoredSummaryUTXOS().collect { storedData ->
+            val metricRetrievalId = MetricsRetrievalModel.USAGE_UTXO
+            val metricTitle = "UTXOs"
+            when (storedData) {
+                is Response.Loading -> {
+                }
+
                 is Response.Success -> {
-                    val index =
-                        usageList.indexOfFirst { it.id == MetricsRetrievalModel.USAGE_UTXO }
-                    if (index != -1) {
-                        usageList[index] = SummaryAddressModel(
-                            id = MetricsRetrievalModel.USAGE_UTXO,
-                            title = "UTXOs",
-                            subtitle = "",
-                            response.data?.first()?.current?.toInt().toString(),
-                            response.data
+                    if (storedData.data?.isNotEmpty() == true) {
+                        usageList.add(
+                            0, SummaryAddressModel(
+                                id = metricRetrievalId,
+                                title = metricTitle,
+                                subtitle = EMPTY_STRING,
+                                storedData.data.first().current.toInt().toString(),
+                                storedData.data
+                            )
                         )
                     }
-                    ergoWatchRepository.replaceSummaryUTXOS(
-                        response.data ?: emptyList()
-                    )
+                    ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
+                        when (response) {
+                            is Response.Success -> {
+                                val index =
+                                    usageList.indexOfFirst { it.id == metricRetrievalId }
+                                if (index != -1) {
+                                    usageList[index] = SummaryAddressModel(
+                                        id = metricRetrievalId,
+                                        title = metricTitle,
+                                        subtitle = EMPTY_STRING,
+                                        response.data?.first()?.current?.toInt().toString(),
+                                        response.data
+                                    )
+                                }
+                                ergoWatchRepository.replaceSummaryUTXOS(response.data ?: emptyList())
+                            }
+
+                            is Response.Failure -> {
+                                _isUsageDataLoaded.value =
+                                    Response.Failure(Exception("Unexpected Error Occurred"))
+                            }
+
+                            else -> {}
+                        }
+                    }
+
                 }
 
                 is Response.Failure -> {
                     _isUsageDataLoaded.value =
                         Response.Failure(Exception("Unexpected Error Occurred"))
                 }
+            }
+        }
 
-                else -> {}
+    private suspend fun fetchAndStoreSummaryTransactions(usageList: MutableList<SummaryAddressModel>) =
+        ergoWatchRepository.fetchStoredSummaryTransactions().collect { storedData ->
+            val metricRetrievalId = MetricsRetrievalModel.USAGE_TRANSACTIONS
+            val metricTitle = "Transactions"
+            when (storedData) {
+                is Response.Loading -> {
+                }
+
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
+                        usageList.add(
+                            0, SummaryAddressModel(
+                                id = metricRetrievalId,
+                                title = metricTitle,
+                                subtitle = EMPTY_STRING,
+                                storedData.data.first().current.toInt().toString(),
+                                storedData.data
+                            )
+                        )
+                    }
+                    ergoWatchRepository.fetchSummaryTransactions().collect { response ->
+                        when (response) {
+                            is Response.Success -> {
+                                val index =
+                                    usageList.indexOfFirst { it.id == metricRetrievalId }
+                                if (index != -1) {
+                                    usageList[index] = SummaryAddressModel(
+                                        id = metricRetrievalId,
+                                        title = metricTitle,
+                                        subtitle = EMPTY_STRING,
+                                        response.data?.first()?.current?.toInt().toString(),
+                                        response.data
+                                    )
+                                }
+                                ergoWatchRepository.replaceSummaryTransactions(response.data ?: emptyList())
+                            }
+
+                            is Response.Failure -> {
+                                _isUsageDataLoaded.value =
+                                    Response.Failure(Exception("Unexpected Error Occurred"))
+                            }
+
+                            else -> {}
+                        }
+                    }
+
+                }
+
+                is Response.Failure -> {
+                    _isUsageDataLoaded.value =
+                        Response.Failure(Exception("Unexpected Error Occurred"))
+                }
+            }
+        }
+
+    private suspend fun fetchAndStoreSummaryVolume(usageList: MutableList<SummaryAddressModel>) =
+        ergoWatchRepository.fetchStoredSummaryVolume().collect { storedData ->
+            val metricRetrievalId = MetricsRetrievalModel.USAGE_VOLUME
+            val metricTitle = "Transfer Volume"
+            when (storedData) {
+                is Response.Loading -> {
+//                        _isUsageDataLoaded.value = Response.Loading
+                }
+
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
+                        usageList.add(
+                            0, SummaryAddressModel(
+                                id = metricRetrievalId,
+                                title = metricTitle,
+                                subtitle = EMPTY_STRING,
+                                "${
+                                    storedData.data.first().current.toDouble().div(1000000000)
+                                        .toBigDecimal()
+                                        .setScale(2, RoundingMode.HALF_UP)?.toInt()
+                                } ERG",
+                                storedData.data
+                            )
+                        )
+                    }
+                    ergoWatchRepository.fetchSummaryVolume().collect { response ->
+                        when (response) {
+                            is Response.Success -> {
+                                val index =
+                                    usageList.indexOfFirst { it.id == metricRetrievalId }
+                                if (index != -1) {
+                                    usageList[index] = SummaryAddressModel(
+                                        id = metricRetrievalId,
+                                        title = metricTitle,
+                                        subtitle = EMPTY_STRING,
+                                        "${
+                                            response.data?.first()?.current?.toDouble()?.div(1000000000)
+                                                ?.toBigDecimal()
+                                                ?.setScale(2, RoundingMode.HALF_UP)?.toInt()
+                                        } ERG",
+                                        response.data
+                                    )
+                                }
+                                ergoWatchRepository.replaceSummaryVolume(response.data ?: emptyList())
+                            }
+
+                            is Response.Failure -> {
+                                _isUsageDataLoaded.value =
+                                    Response.Failure(Exception("Unexpected Error Occurred"))
+                            }
+
+                            else -> {}
+                        }
+                    }
+
+                }
+
+                is Response.Failure -> {
+                    _isUsageDataLoaded.value =
+                        Response.Failure(Exception("Unexpected Error Occurred"))
+                }
             }
         }
 

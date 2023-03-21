@@ -313,14 +313,14 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = metrics.map {
                 SummaryMetricsEntity(
                     label = it.label,
-                    current = it.current.toLong(),
+                    current = it.current.toDouble().times(10000).toLong(),
                     isRelative = true,
                     isP2pks = true,
-                    diff1d = it.diff1d.toLong(),
-                    diff1w = it.diff1w.toLong(),
-                    diff4w = it.diff4w.toLong(),
-                    diff6m = it.diff6m.toLong(),
-                    diff1y = it.diff1y.toLong()
+                    diff1d = it.diff1d.toDouble().times(10000).toLong(),
+                    diff1w = it.diff1w.toDouble().times(10000).toLong(),
+                    diff4w = it.diff4w.toDouble().times(10000).toLong(),
+                    diff6m = it.diff6m.toDouble().times(10000).toLong(),
+                    diff1y = it.diff1y.toDouble().times(10000).toLong()
                 )
             }
             ergoWatchDao.insertMetricsData(metrics = mappedList)
@@ -346,19 +346,20 @@ class ErgoWatchRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSupplyDistributionContracts(metrics: List<SummaryMetricsModel>) {
+        //Multiplying by 10000 to store the decimal values on a long
         if (metrics.isNotEmpty()) {
             ergoWatchDao.clearSupplyDistributionContractsData()
             val mappedList = metrics.map {
                 SummaryMetricsEntity(
                     label = it.label,
-                    current = it.current.toLong(),
+                    current = it.current.toDouble().times(10000).toLong(),
                     isRelative = true,
                     isContracts = true,
-                    diff1d = it.diff1d.toLong(),
-                    diff1w = it.diff1w.toLong(),
-                    diff4w = it.diff4w.toLong(),
-                    diff6m = it.diff6m.toLong(),
-                    diff1y = it.diff1y.toLong()
+                    diff1d = it.diff1d.toDouble().times(10000).toLong(),
+                    diff1w = it.diff1w.toDouble().times(10000).toLong(),
+                    diff4w = it.diff4w.toDouble().times(10000).toLong(),
+                    diff6m = it.diff6m.toDouble().times(10000).toLong(),
+                    diff1y = it.diff1y.toDouble().times(10000).toLong()
                 )
             }
             ergoWatchDao.insertMetricsData(metrics = mappedList)

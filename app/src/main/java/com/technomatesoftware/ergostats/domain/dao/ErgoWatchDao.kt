@@ -42,13 +42,13 @@ interface ErgoWatchDao {
     @Query("DELETE FROM summary_metrics WHERE is_transactions = :isTransactions")
     suspend fun clearSummaryTransactionsData(isTransactions: Boolean = true)
 
-    @Query("SELECT * FROM summary_metrics WHERE is_p2pks = :isTransactions")
+    @Query("SELECT * FROM summary_metrics WHERE is_transactions = :isTransactions")
     suspend fun getSummaryTransactionsData(isTransactions: Boolean = true): List<SummaryMetricsEntity>
 
-    @Query("DELETE FROM summary_metrics WHERE is_p2pks = :isMiners")
+    @Query("DELETE FROM summary_metrics WHERE is_miners = :isMiners")
     suspend fun clearSummaryMinersData(isMiners: Boolean = true)
 
-    @Query("SELECT * FROM summary_metrics WHERE is_p2pks = :isMiners")
+    @Query("SELECT * FROM summary_metrics WHERE is_miners = :isMiners")
     suspend fun getSummaryMinersData(isMiners: Boolean = true): List<SummaryMetricsEntity>
 
     @Query("DELETE FROM summary_metrics WHERE is_contracts = :isContracts AND is_relative = :isRelative")

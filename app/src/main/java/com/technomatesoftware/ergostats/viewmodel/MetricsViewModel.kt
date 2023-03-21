@@ -63,7 +63,8 @@ class MetricsViewModel @Inject constructor(
         viewModelScope.launch {
             getStoredSummaryAddressData()
             getSummaryAddressNetworkData()
-            getSupplyDistributionData()
+            getStoredSupplyDistributionData()
+            getSupplyDistributionNetworkData()
             getStoredUsageData()
             getUsageNetworkData()
             getCirculatingSupply()
@@ -233,15 +234,84 @@ class MetricsViewModel @Inject constructor(
         }
     }
 
-    private fun getSupplyDistributionData() {
+    private fun getStoredSupplyDistributionData() {
+        viewModelScope.launch {
+            val supplyDistributionList: MutableList<SummaryAddressModel> = mutableListOf()
+            val numberFormatter = NumberFormatter()
+            ergoWatchRepository.fetchStoredSupplyDistributionContracts().collect { storedData ->
+                when (storedData) {
+                    is Response.Loading -> {
+                        _isSupplyDataLoaded.value = Response.Loading
+                    }
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            val distributionData = storedData.data
+                                //div 100 to get the decimals stored
+                            supplyDistributionList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.SUPPLY_CONTRACTS,
+                                    title = "Contracts",
+                                    subtitle = "Top 1%",
+                                    numberFormatter.toPercentWithDecimals(
+                                        distributionData.first().current.toDouble().div(100),
+                                        2
+                                    ),
+                                    distributionData
+                                )
+                            )
+                        }
+
+                    }
+
+                    is Response.Failure -> {
+                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    }
+                }
+            }
+
+            ergoWatchRepository.fetchStoredSupplyDistributionP2pk().collect { storedData ->
+                when (storedData) {
+                    is Response.Loading -> {
+                        _isSupplyDataLoaded.value = Response.Loading
+                    }
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            val distributionData = storedData.data
+                            supplyDistributionList.add(
+                                0,
+                                SummaryAddressModel(
+                                    MetricsRetrievalModel.SUPPLY_P2PK,
+                                    "P2PKs",
+                                    "Top 1%",
+                                    numberFormatter.toPercentWithDecimals(
+                                        distributionData.first().current.toDouble().div(100), 2
+                                    ),
+                                    distributionData
+                                )
+                            )
+                        }
+                    }
+
+                    is Response.Failure -> {
+                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    }
+                }
+            }
+
+            _supplyDataState.value = supplyDistributionList
+            _isSupplyDataLoaded.value = Response.Success(true)
+        }
+    }
+
+    private fun getSupplyDistributionNetworkData() {
         viewModelScope.launch {
             val supplyDistributionList: MutableList<SummaryAddressModel> = mutableListOf()
             val numberFormatter = NumberFormatter()
             ergoWatchRepository.fetchSupplyDistributionContracts().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSupplyDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         val distributionData = response.data?.relative
@@ -258,19 +328,18 @@ class MetricsViewModel @Inject constructor(
                                 distributionData
                             )
                         )
+
+                        ergoWatchRepository.replaceSupplyDistributionContracts(distributionData ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             ergoWatchRepository.fetchSupplyDistributionP2pk().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSupplyDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         val distributionData = response.data?.relative
@@ -286,16 +355,16 @@ class MetricsViewModel @Inject constructor(
                                 distributionData
                             )
                         )
+                        ergoWatchRepository.replaceSupplyDistributionP2pk(distributionData ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             _supplyDataState.value = supplyDistributionList
-            _isSupplyDataLoaded.value = Response.Success(true)
         }
     }
 

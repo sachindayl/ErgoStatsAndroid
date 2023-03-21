@@ -61,10 +61,11 @@ class MetricsViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
-            getSummaryAddressData()
+            getStoredSummaryAddressData()
+            getSummaryAddressNetworkData()
             getSupplyDistributionData()
-            fetchStoredUsageData()
-            fetchUsageNetworkData()
+            getStoredUsageData()
+            getUsageNetworkData()
             getCirculatingSupply()
         }
     }
@@ -74,14 +75,93 @@ class MetricsViewModel @Inject constructor(
         return "${formatter.format(TOTAL_ERGO_SUPPLY)} ERG"
     }
 
-    private fun getSummaryAddressData() {
+    private fun getStoredSummaryAddressData() {
+        viewModelScope.launch {
+            _isSummaryAddressDataLoaded.value = Response.Loading
+            val summaryAddressList: MutableList<SummaryAddressModel> = mutableListOf()
+            ergoWatchRepository.fetchStoredSummaryContracts().collect { storedData ->
+                when (storedData) {
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            summaryAddressList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.ADDRESS_CONTRACTS,
+                                    title = "Contracts",
+                                    subtitle = "Total",
+                                    value = storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
+                            )
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+
+            ergoWatchRepository.fetchStoredSummaryMiners().collect { storedData ->
+                when (storedData) {
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            summaryAddressList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.ADDRESS_MINING,
+                                    title = "Miners",
+                                    subtitle = "Total",
+                                    value = storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+
+            ergoWatchRepository.fetchStoredSummaryP2pk().collect { storedData ->
+                when (storedData) {
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            summaryAddressList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.ADDRESS_P2PK,
+                                    title = "P2PKs",
+                                    subtitle = "Total",
+                                    storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+
+            _summaryAddressesState.value = summaryAddressList
+            _isSummaryAddressDataLoaded.value = Response.Success(true)
+        }
+    }
+
+    private fun getSummaryAddressNetworkData() {
         viewModelScope.launch {
             val summaryAddressList: MutableList<SummaryAddressModel> = mutableListOf()
             ergoWatchRepository.fetchSummaryContracts().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSummaryAddressDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         summaryAddressList.add(
@@ -94,19 +174,17 @@ class MetricsViewModel @Inject constructor(
                                 response.data
                             )
                         )
+                        ergoWatchRepository.replaceSummaryContracts(response.data ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSummaryAddressDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             ergoWatchRepository.fetchSummaryMiners().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSummaryAddressDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         summaryAddressList.add(
@@ -119,19 +197,17 @@ class MetricsViewModel @Inject constructor(
                                 response.data
                             )
                         )
+                        ergoWatchRepository.replaceSummaryMiners(response.data ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSummaryAddressDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             ergoWatchRepository.fetchSummaryP2pk().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSummaryAddressDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         summaryAddressList.add(
@@ -144,16 +220,16 @@ class MetricsViewModel @Inject constructor(
                                 response.data
                             )
                         )
+                        ergoWatchRepository.replaceSummaryP2pk(response.data ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSummaryAddressDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             _summaryAddressesState.value = summaryAddressList
-            _isSummaryAddressDataLoaded.value = Response.Success(true)
         }
     }
 
@@ -223,11 +299,11 @@ class MetricsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun fetchStoredUsageData() {
+    private suspend fun getStoredUsageData() {
         val usageList: MutableList<SummaryAddressModel> = mutableListOf()
         ergoWatchRepository.fetchStoredSummaryUTXOS().collect { storedData ->
 
-            when(storedData) {
+            when (storedData) {
                 is Response.Success -> {
                     if (storedData.data?.isNotEmpty() == true) {
                         usageList.add(
@@ -242,12 +318,14 @@ class MetricsViewModel @Inject constructor(
                     }
                 }
 
-                else -> {}
+                else -> {
+                    //Do Nothing
+                }
             }
         }
 
         ergoWatchRepository.fetchStoredSummaryVolume().collect { storedData ->
-            when(storedData) {
+            when (storedData) {
                 is Response.Success -> {
                     if (storedData.data?.isNotEmpty() == true) {
                         usageList.add(
@@ -266,12 +344,14 @@ class MetricsViewModel @Inject constructor(
                     }
                 }
 
-                else -> {}
+                else -> {
+                    //Do Nothing
+                }
             }
         }
 
         ergoWatchRepository.fetchStoredSummaryTransactions().collect { storedData ->
-            when(storedData) {
+            when (storedData) {
                 is Response.Success -> {
                     if (storedData.data?.isNotEmpty() == true) {
                         usageList.add(
@@ -286,37 +366,44 @@ class MetricsViewModel @Inject constructor(
                     }
                 }
 
-                else -> {}
+                else -> {
+                    //Do Nothing
+                }
             }
         }
         _isUsageDataLoaded.value = Response.Success(true)
         _usageDataState.value = usageList
     }
 
-    private suspend fun fetchUsageNetworkData() {
+    private suspend fun getUsageNetworkData() {
         val usageList: MutableList<SummaryAddressModel> = mutableListOf()
         ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
 
-            when(response) {
+            when (response) {
                 is Response.Success -> {
-                    usageList.add(0, SummaryAddressModel(
-                        id = MetricsRetrievalModel.USAGE_UTXO,
-                        title = "UTXOs",
-                        subtitle = EMPTY_STRING,
-                        response.data?.first()?.current?.toInt().toString(),
-                        response.data
-                    ))
+                    usageList.add(
+                        0, SummaryAddressModel(
+                            id = MetricsRetrievalModel.USAGE_UTXO,
+                            title = "UTXOs",
+                            subtitle = EMPTY_STRING,
+                            response.data?.first()?.current?.toInt().toString(),
+                            response.data
+                        )
+                    )
                     ergoWatchRepository.replaceSummaryUTXOS(response.data ?: emptyList())
                 }
 
-                else -> {}
+                else -> {
+                    //Do Nothing
+                }
             }
         }
 
         ergoWatchRepository.fetchSummaryVolume().collect { response ->
-            when(response) {
+            when (response) {
                 is Response.Success -> {
-                        usageList.add(SummaryAddressModel(
+                    usageList.add(
+                        SummaryAddressModel(
                             id = MetricsRetrievalModel.USAGE_VOLUME,
                             title = "Transfer Volume",
                             subtitle = EMPTY_STRING,
@@ -326,30 +413,37 @@ class MetricsViewModel @Inject constructor(
                                     ?.setScale(2, RoundingMode.HALF_UP)?.toInt()
                             } ERG",
                             response.data
-                        ))
+                        )
+                    )
 
                     ergoWatchRepository.replaceSummaryVolume(response.data ?: emptyList())
                 }
 
-                else -> {}
+                else -> {
+                    //Do Nothing
+                }
             }
         }
 
         ergoWatchRepository.fetchSummaryTransactions().collect { response ->
-            when(response) {
+            when (response) {
                 is Response.Success -> {
-                        usageList.add(SummaryAddressModel(
+                    usageList.add(
+                        SummaryAddressModel(
                             id = MetricsRetrievalModel.USAGE_TRANSACTIONS,
                             title = "Transactions",
                             subtitle = EMPTY_STRING,
                             response.data?.first()?.current?.toInt().toString(),
                             response.data
-                        ))
+                        )
+                    )
 
                     ergoWatchRepository.replaceSummaryTransactions(response.data ?: emptyList())
                 }
 
-                else -> {}
+                else -> {
+                    //Do Nothing
+                }
             }
         }
 

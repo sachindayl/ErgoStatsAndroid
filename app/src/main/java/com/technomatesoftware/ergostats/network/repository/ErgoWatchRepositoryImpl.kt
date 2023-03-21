@@ -9,6 +9,7 @@ import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
 import com.technomatesoftware.ergostats.network.services.ErgoWatchService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -22,99 +23,61 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchSummaryUTXOS(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSummaryUTXOS()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryUTXOS()
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSummaryVolume(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSummaryVolume()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryVolume()
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSummaryTransactions(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSummaryTransactions()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryTransactions()
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSummaryMiners(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSummaryMiners()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryMiners()
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSummaryContracts(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSummaryContracts()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryContracts()
+            emit(Response.Success(result))
 
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSummaryP2pk(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSummaryP2pk()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryP2pk()
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSupplyDistributionP2pk(): Flow<Response<SupplyDistributionModel>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSupplyDistributionP2pk()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSupplyDistributionP2pk()
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun fetchSupplyDistributionContracts(): Flow<Response<SupplyDistributionModel>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchService.fetchSupplyDistributionContracts()
-                emit(Response.Success(result))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSupplyDistributionContracts()
+            emit(Response.Success(result))
 
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSummaryUTXOS(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -137,26 +100,21 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSummaryUTXOS(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSummaryUTXOData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSummaryUTXOData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSummaryP2pk(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -179,26 +137,21 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSummaryP2pk(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSummaryP2pkData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSummaryP2pkData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSummaryVolume(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -221,26 +174,21 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSummaryVolume(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSummaryVolumeData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSummaryVolumeData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSummaryTransactions(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -263,26 +211,21 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSummaryTransactions(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSummaryTransactionsData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSummaryTransactionsData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSummaryMiners(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -305,26 +248,22 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSummaryMiners(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSummaryMinersData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSummaryMinersData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
 
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSummaryContracts(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -366,7 +305,7 @@ class ErgoWatchRepositoryImpl @Inject constructor(
                 emit(Response.Failure(e))
             }
 
-        }.flowOn(Dispatchers.IO)
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSupplyDistributionP2pk(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -390,25 +329,21 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSupplyDistributionP2pk(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSupplyDistributionP2pkData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSupplyDistributionP2pkData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
     override suspend fun replaceSupplyDistributionContracts(metrics: List<SummaryMetricsModel>) {
         if (metrics.isNotEmpty()) {
@@ -432,25 +367,21 @@ class ErgoWatchRepositoryImpl @Inject constructor(
 
     override suspend fun fetchStoredSupplyDistributionContracts(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
-            try {
-                emit(Response.Loading)
-                val result = ergoWatchDao.getSupplyDistributionContractsData()
-                val mappedList = result.map {
-                    SummaryMetricsModel(
-                        label = it.label,
-                        current = it.current,
-                        diff1d = it.diff1d,
-                        diff1w = it.diff1w,
-                        diff4w = it.diff4w,
-                        diff6m = it.diff6m,
-                        diff1y = it.diff1y
-                    )
-                }.toList()
-                emit(Response.Success(mappedList))
-            } catch (e: Exception) {
-                emit(Response.Failure(e))
-            }
-        }.flowOn(Dispatchers.IO)
+            emit(Response.Loading)
+            val result = ergoWatchDao.getSupplyDistributionContractsData()
+            val mappedList = result.map {
+                SummaryMetricsModel(
+                    label = it.label,
+                    current = it.current,
+                    diff1d = it.diff1d,
+                    diff1w = it.diff1w,
+                    diff4w = it.diff4w,
+                    diff6m = it.diff6m,
+                    diff1y = it.diff1y
+                )
+            }.toList()
+            emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
 
 }

@@ -52,7 +52,7 @@ class MetricsViewModel @Inject constructor(
         mutableStateOf(Response.Loading)
     val isUsageDataLoaded: State<Response<Boolean>> = _isUsageDataLoaded
     private val _isCirculatingSupplyLoaded: MutableState<Response<Boolean>> =
-        mutableStateOf(Response.Loading)
+        mutableStateOf(Response.Success(true))
     val isCirculatingSupplyLoaded: State<Response<Boolean>> = _isCirculatingSupplyLoaded
 
     init {
@@ -61,13 +61,14 @@ class MetricsViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            getStoredCirculatingSupply()
             getStoredSummaryAddressData()
-            getSummaryAddressNetworkData()
             getStoredSupplyDistributionData()
-            getSupplyDistributionNetworkData()
             getStoredUsageData()
+            getSummaryAddressNetworkData()
+            getSupplyDistributionNetworkData()
             getUsageNetworkData()
-            getCirculatingSupply()
+            getCirculatingNetworkSupply()
         }
     }
 
@@ -153,6 +154,7 @@ class MetricsViewModel @Inject constructor(
                 }
             }
 
+            summaryAddressList.sortBy { it.title }
             _summaryAddressesState.value = summaryAddressList
             _isSummaryAddressDataLoaded.value = Response.Success(true)
         }
@@ -230,6 +232,7 @@ class MetricsViewModel @Inject constructor(
                 }
             }
 
+            summaryAddressList.sortBy { it.title }
             _summaryAddressesState.value = summaryAddressList
         }
     }
@@ -247,7 +250,7 @@ class MetricsViewModel @Inject constructor(
                     is Response.Success -> {
                         if (storedData.data?.isNotEmpty() == true) {
                             val distributionData = storedData.data
-                                //div 100 to get the decimals stored
+                            //div 100 to get the decimals stored
                             supplyDistributionList.add(
                                 0,
                                 SummaryAddressModel(
@@ -301,6 +304,7 @@ class MetricsViewModel @Inject constructor(
                 }
             }
 
+            supplyDistributionList.sortBy { it.title }
             _supplyDataState.value = supplyDistributionList
             _isSupplyDataLoaded.value = Response.Success(true)
         }
@@ -329,7 +333,9 @@ class MetricsViewModel @Inject constructor(
                             )
                         )
 
-                        ergoWatchRepository.replaceSupplyDistributionContracts(distributionData ?: emptyList())
+                        ergoWatchRepository.replaceSupplyDistributionContracts(
+                            distributionData ?: emptyList()
+                        )
                     }
 
                     else -> {
@@ -355,7 +361,9 @@ class MetricsViewModel @Inject constructor(
                                 distributionData
                             )
                         )
-                        ergoWatchRepository.replaceSupplyDistributionP2pk(distributionData ?: emptyList())
+                        ergoWatchRepository.replaceSupplyDistributionP2pk(
+                            distributionData ?: emptyList()
+                        )
                     }
 
                     else -> {
@@ -364,6 +372,7 @@ class MetricsViewModel @Inject constructor(
                 }
             }
 
+            supplyDistributionList.sortBy { it.title }
             _supplyDataState.value = supplyDistributionList
         }
     }
@@ -440,6 +449,7 @@ class MetricsViewModel @Inject constructor(
                 }
             }
         }
+        usageList.sortBy { it.title }
         _isUsageDataLoaded.value = Response.Success(true)
         _usageDataState.value = usageList
     }
@@ -516,16 +526,47 @@ class MetricsViewModel @Inject constructor(
             }
         }
 
+        usageList.sortBy { it.title }
         _usageDataState.value = usageList
     }
 
-    private fun getCirculatingSupply() {
+    private fun getStoredCirculatingSupply() {
         viewModelScope.launch {
-            ergoPlatformRepository.fetchSupply().collect { response ->
-                when (response) {
+            ergoPlatformRepository.fetchStoredCirculatingSupply().collect { storedData ->
+                when (storedData) {
                     is Response.Loading -> {
                         _isCirculatingSupplyLoaded.value = Response.Loading
                     }
+
+                    is Response.Success -> {
+                        Log.d("getSupply", storedData.data.toString())
+                        if (storedData.data != null) {
+                            _isCirculatingSupplyLoaded.value = Response.Success(true)
+                            val circulatingSupply = storedData.data
+                            val formatter = DecimalFormat("#,###")
+
+                            _circulatingSupplyState.value =
+                                "${formatter.format(circulatingSupply)} ERG"
+                            _percentMinedState.value = circulatingSupply.div(TOTAL_ERGO_SUPPLY)
+                        }
+
+
+                    }
+
+                    is Response.Failure -> {
+                        _isCirculatingSupplyLoaded.value =
+                            Response.Failure(Exception("Unexpected Error Occurred"))
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun getCirculatingNetworkSupply() {
+        viewModelScope.launch {
+            ergoPlatformRepository.fetchSupply().collect { response ->
+                when (response) {
 
                     is Response.Success -> {
                         Log.d("getSupply", response.data.toString())
@@ -533,13 +574,13 @@ class MetricsViewModel @Inject constructor(
                         val formatter = DecimalFormat("#,###")
 
                         _circulatingSupplyState.value = "${formatter.format(circulatingSupply)} ERG"
-                        _isCirculatingSupplyLoaded.value = Response.Success(true)
-
                         _percentMinedState.value = circulatingSupply?.div(TOTAL_ERGO_SUPPLY)
+                        _isCirculatingSupplyLoaded.value = Response.Success(true)
+                        ergoPlatformRepository.replaceCirculatingSupply(response.data)
                     }
 
-                    is Response.Failure -> {
-                        _isCirculatingSupplyLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }

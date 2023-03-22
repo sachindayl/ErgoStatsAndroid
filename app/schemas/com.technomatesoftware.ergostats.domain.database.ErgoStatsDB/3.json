@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "be50cb02d7511274f7aa52e7deee048c",
+    "version": 3,
+    "identityHash": "b2a4b69ab93862d7fae084d3ff4122a4",
     "entities": [
       {
         "tableName": "coin_market_data",
@@ -327,12 +327,38 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "token_supply",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`token_supply_id` INTEGER NOT NULL, `circulating_supply` REAL NOT NULL, PRIMARY KEY(`token_supply_id`))",
+        "fields": [
+          {
+            "fieldPath": "tokenSupplyId",
+            "columnName": "token_supply_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "circulatingSupply",
+            "columnName": "circulating_supply",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "token_supply_id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'be50cb02d7511274f7aa52e7deee048c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b2a4b69ab93862d7fae084d3ff4122a4')"
     ]
   }
 }

@@ -52,19 +52,23 @@ class MetricsViewModel @Inject constructor(
         mutableStateOf(Response.Loading)
     val isUsageDataLoaded: State<Response<Boolean>> = _isUsageDataLoaded
     private val _isCirculatingSupplyLoaded: MutableState<Response<Boolean>> =
-        mutableStateOf(Response.Loading)
+        mutableStateOf(Response.Success(true))
     val isCirculatingSupplyLoaded: State<Response<Boolean>> = _isCirculatingSupplyLoaded
 
     init {
         loadData()
     }
 
-    fun loadData() {
+    private fun loadData() {
         viewModelScope.launch {
-            getSummaryAddressData()
-            getSupplyDistributionData()
-            getUsageData()
-            getCirculatingSupply()
+            getStoredCirculatingSupply()
+            getStoredSummaryAddressData()
+            getStoredSupplyDistributionData()
+            getStoredUsageData()
+            getSummaryAddressNetworkData()
+            getSupplyDistributionNetworkData()
+            getUsageNetworkData()
+            getCirculatingNetworkSupply()
         }
     }
 
@@ -73,14 +77,94 @@ class MetricsViewModel @Inject constructor(
         return "${formatter.format(TOTAL_ERGO_SUPPLY)} ERG"
     }
 
-    private fun getSummaryAddressData() {
+    private fun getStoredSummaryAddressData() {
+        viewModelScope.launch {
+            _isSummaryAddressDataLoaded.value = Response.Loading
+            val summaryAddressList: MutableList<SummaryAddressModel> = mutableListOf()
+            ergoWatchRepository.fetchStoredSummaryContracts().collect { storedData ->
+                when (storedData) {
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            summaryAddressList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.ADDRESS_CONTRACTS,
+                                    title = "Contracts",
+                                    subtitle = "Total",
+                                    value = storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
+                            )
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+
+            ergoWatchRepository.fetchStoredSummaryMiners().collect { storedData ->
+                when (storedData) {
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            summaryAddressList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.ADDRESS_MINING,
+                                    title = "Miners",
+                                    subtitle = "Total",
+                                    value = storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+
+            ergoWatchRepository.fetchStoredSummaryP2pk().collect { storedData ->
+                when (storedData) {
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            summaryAddressList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.ADDRESS_P2PK,
+                                    title = "P2PKs",
+                                    subtitle = "Total",
+                                    storedData.data.first().current.toInt().toString(),
+                                    storedData.data
+                                )
+                            )
+                        }
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+
+            summaryAddressList.sortBy { it.title }
+            _summaryAddressesState.value = summaryAddressList
+            _isSummaryAddressDataLoaded.value = Response.Success(true)
+        }
+    }
+
+    private fun getSummaryAddressNetworkData() {
         viewModelScope.launch {
             val summaryAddressList: MutableList<SummaryAddressModel> = mutableListOf()
             ergoWatchRepository.fetchSummaryContracts().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSummaryAddressDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         summaryAddressList.add(
@@ -93,19 +177,17 @@ class MetricsViewModel @Inject constructor(
                                 response.data
                             )
                         )
+                        ergoWatchRepository.replaceSummaryContracts(response.data ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSummaryAddressDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             ergoWatchRepository.fetchSummaryMiners().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSummaryAddressDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         summaryAddressList.add(
@@ -118,19 +200,17 @@ class MetricsViewModel @Inject constructor(
                                 response.data
                             )
                         )
+                        ergoWatchRepository.replaceSummaryMiners(response.data ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSummaryAddressDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             ergoWatchRepository.fetchSummaryP2pk().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSummaryAddressDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         summaryAddressList.add(
@@ -143,28 +223,99 @@ class MetricsViewModel @Inject constructor(
                                 response.data
                             )
                         )
+                        ergoWatchRepository.replaceSummaryP2pk(response.data ?: emptyList())
                     }
 
-                    is Response.Failure -> {
-                        _isSummaryAddressDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
+            summaryAddressList.sortBy { it.title }
             _summaryAddressesState.value = summaryAddressList
-            _isSummaryAddressDataLoaded.value = Response.Success(true)
         }
     }
 
-    private fun getSupplyDistributionData() {
+    private fun getStoredSupplyDistributionData() {
+        viewModelScope.launch {
+            val supplyDistributionList: MutableList<SummaryAddressModel> = mutableListOf()
+            val numberFormatter = NumberFormatter()
+            ergoWatchRepository.fetchStoredSupplyDistributionContracts().collect { storedData ->
+                when (storedData) {
+                    is Response.Loading -> {
+                        _isSupplyDataLoaded.value = Response.Loading
+                    }
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            val distributionData = storedData.data
+                            //div 100 to get the decimals stored
+                            supplyDistributionList.add(
+                                0,
+                                SummaryAddressModel(
+                                    id = MetricsRetrievalModel.SUPPLY_CONTRACTS,
+                                    title = "Contracts",
+                                    subtitle = "Top 1%",
+                                    numberFormatter.toPercentWithDecimals(
+                                        distributionData.first().current.toDouble().div(100),
+                                        2
+                                    ),
+                                    distributionData
+                                )
+                            )
+                        }
+
+                    }
+
+                    is Response.Failure -> {
+                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    }
+                }
+            }
+
+            ergoWatchRepository.fetchStoredSupplyDistributionP2pk().collect { storedData ->
+                when (storedData) {
+                    is Response.Loading -> {
+                        _isSupplyDataLoaded.value = Response.Loading
+                    }
+
+                    is Response.Success -> {
+                        if (storedData.data?.isNotEmpty() == true) {
+                            val distributionData = storedData.data
+                            supplyDistributionList.add(
+                                0,
+                                SummaryAddressModel(
+                                    MetricsRetrievalModel.SUPPLY_P2PK,
+                                    "P2PKs",
+                                    "Top 1%",
+                                    numberFormatter.toPercentWithDecimals(
+                                        distributionData.first().current.toDouble().div(100), 2
+                                    ),
+                                    distributionData
+                                )
+                            )
+                        }
+                    }
+
+                    is Response.Failure -> {
+                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    }
+                }
+            }
+
+            supplyDistributionList.sortBy { it.title }
+            _supplyDataState.value = supplyDistributionList
+            _isSupplyDataLoaded.value = Response.Success(true)
+        }
+    }
+
+    private fun getSupplyDistributionNetworkData() {
         viewModelScope.launch {
             val supplyDistributionList: MutableList<SummaryAddressModel> = mutableListOf()
             val numberFormatter = NumberFormatter()
             ergoWatchRepository.fetchSupplyDistributionContracts().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSupplyDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         val distributionData = response.data?.relative
@@ -181,19 +332,20 @@ class MetricsViewModel @Inject constructor(
                                 distributionData
                             )
                         )
+
+                        ergoWatchRepository.replaceSupplyDistributionContracts(
+                            distributionData ?: emptyList()
+                        )
                     }
 
-                    is Response.Failure -> {
-                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
             ergoWatchRepository.fetchSupplyDistributionP2pk().collect { response ->
                 when (response) {
-                    is Response.Loading -> {
-                        _isSupplyDataLoaded.value = Response.Loading
-                    }
 
                     is Response.Success -> {
                         val distributionData = response.data?.relative
@@ -209,113 +361,212 @@ class MetricsViewModel @Inject constructor(
                                 distributionData
                             )
                         )
+                        ergoWatchRepository.replaceSupplyDistributionP2pk(
+                            distributionData ?: emptyList()
+                        )
                     }
 
-                    is Response.Failure -> {
-                        _isSupplyDataLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }
 
+            supplyDistributionList.sortBy { it.title }
             _supplyDataState.value = supplyDistributionList
-            _isSupplyDataLoaded.value = Response.Success(true)
         }
     }
 
-    private fun getUsageData() {
-        viewModelScope.launch {
-            val usageList: MutableList<SummaryAddressModel> = mutableListOf()
-            ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        _isUsageDataLoaded.value = Response.Loading
-                    }
+    private suspend fun getStoredUsageData() {
+        val usageList: MutableList<SummaryAddressModel> = mutableListOf()
+        ergoWatchRepository.fetchStoredSummaryUTXOS().collect { storedData ->
 
-                    is Response.Success -> {
+            when (storedData) {
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
                         usageList.add(
-                            0,
-                            SummaryAddressModel(
+                            0, SummaryAddressModel(
                                 id = MetricsRetrievalModel.USAGE_UTXO,
                                 title = "UTXOs",
-                                subtitle = "",
-                                response.data?.first()?.current?.toInt().toString(),
-                                response.data
-                            )
-                        )
-                    }
-
-                    is Response.Failure -> {
-                        _isUsageDataLoaded.value = Response.Failure(Exception(""))
-                    }
-                }
-            }
-
-            ergoWatchRepository.fetchSummaryTransactions().collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        _isUsageDataLoaded.value = Response.Loading
-                    }
-
-                    is Response.Success -> {
-                        usageList.add(
-                            0,
-                            SummaryAddressModel(
-                                id = MetricsRetrievalModel.USAGE_TRANSACTIONS,
-                                title = "Transactions",
                                 subtitle = EMPTY_STRING,
-                                response.data?.first()?.current?.toInt().toString(),
-                                response.data
+                                storedData.data.first().current.toInt().toString(),
+                                storedData.data
                             )
                         )
                     }
+                }
 
-                    is Response.Failure -> {
-                        _isUsageDataLoaded.value = Response.Failure(Exception(""))
-                    }
+                else -> {
+                    //Do Nothing
                 }
             }
+        }
 
-            ergoWatchRepository.fetchSummaryVolume().collect { response ->
-                when (response) {
-                    is Response.Loading -> {
-                        _isUsageDataLoaded.value = Response.Loading
-                    }
-
-                    is Response.Success -> {
+        ergoWatchRepository.fetchStoredSummaryVolume().collect { storedData ->
+            when (storedData) {
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
                         usageList.add(
-                            0,
-                            SummaryAddressModel(
+                            0, SummaryAddressModel(
                                 id = MetricsRetrievalModel.USAGE_VOLUME,
                                 title = "Transfer Volume",
                                 subtitle = EMPTY_STRING,
-                                value = "${
-                                    response.data?.first()?.current?.toDouble()?.div(1000000000)
-                                        ?.toBigDecimal()
-                                        ?.setScale(2, RoundingMode.HALF_UP)?.toInt()
+                                "${
+                                    storedData.data.first().current.toDouble().div(1000000000)
+                                        .toBigDecimal()
+                                        .setScale(2, RoundingMode.HALF_UP)?.toInt()
                                 } ERG",
-                                dataSet = response.data
+                                storedData.data
                             )
                         )
                     }
+                }
 
-                    is Response.Failure -> {
-                        _isUsageDataLoaded.value = Response.Failure(Exception(""))
-                    }
+                else -> {
+                    //Do Nothing
                 }
             }
-
-            _usageDataState.value = usageList
-            _isUsageDataLoaded.value = Response.Success(true)
         }
+
+        ergoWatchRepository.fetchStoredSummaryTransactions().collect { storedData ->
+            when (storedData) {
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
+                        usageList.add(
+                            0, SummaryAddressModel(
+                                id = MetricsRetrievalModel.USAGE_TRANSACTIONS,
+                                title = "Transactions",
+                                subtitle = EMPTY_STRING,
+                                storedData.data.first().current.toInt().toString(),
+                                storedData.data
+                            )
+                        )
+                    }
+                }
+
+                else -> {
+                    //Do Nothing
+                }
+            }
+        }
+        usageList.sortBy { it.title }
+        _isUsageDataLoaded.value = Response.Success(true)
+        _usageDataState.value = usageList
     }
 
-    private fun getCirculatingSupply() {
+    private suspend fun getUsageNetworkData() {
+        val usageList: MutableList<SummaryAddressModel> = mutableListOf()
+        ergoWatchRepository.fetchSummaryUTXOS().collect { response ->
+
+            when (response) {
+                is Response.Success -> {
+                    usageList.add(
+                        0, SummaryAddressModel(
+                            id = MetricsRetrievalModel.USAGE_UTXO,
+                            title = "UTXOs",
+                            subtitle = EMPTY_STRING,
+                            response.data?.first()?.current?.toInt().toString(),
+                            response.data
+                        )
+                    )
+                    ergoWatchRepository.replaceSummaryUTXOS(response.data ?: emptyList())
+                }
+
+                else -> {
+                    //Do Nothing
+                }
+            }
+        }
+
+        ergoWatchRepository.fetchSummaryVolume().collect { response ->
+            when (response) {
+                is Response.Success -> {
+                    usageList.add(
+                        SummaryAddressModel(
+                            id = MetricsRetrievalModel.USAGE_VOLUME,
+                            title = "Transfer Volume",
+                            subtitle = EMPTY_STRING,
+                            "${
+                                response.data?.first()?.current?.toDouble()?.div(1000000000)
+                                    ?.toBigDecimal()
+                                    ?.setScale(2, RoundingMode.HALF_UP)?.toInt()
+                            } ERG",
+                            response.data
+                        )
+                    )
+
+                    ergoWatchRepository.replaceSummaryVolume(response.data ?: emptyList())
+                }
+
+                else -> {
+                    //Do Nothing
+                }
+            }
+        }
+
+        ergoWatchRepository.fetchSummaryTransactions().collect { response ->
+            when (response) {
+                is Response.Success -> {
+                    usageList.add(
+                        SummaryAddressModel(
+                            id = MetricsRetrievalModel.USAGE_TRANSACTIONS,
+                            title = "Transactions",
+                            subtitle = EMPTY_STRING,
+                            response.data?.first()?.current?.toInt().toString(),
+                            response.data
+                        )
+                    )
+
+                    ergoWatchRepository.replaceSummaryTransactions(response.data ?: emptyList())
+                }
+
+                else -> {
+                    //Do Nothing
+                }
+            }
+        }
+
+        usageList.sortBy { it.title }
+        _usageDataState.value = usageList
+    }
+
+    private fun getStoredCirculatingSupply() {
         viewModelScope.launch {
-            ergoPlatformRepository.fetchSupply().collect { response ->
-                when (response) {
+            ergoPlatformRepository.fetchStoredCirculatingSupply().collect { storedData ->
+                when (storedData) {
                     is Response.Loading -> {
                         _isCirculatingSupplyLoaded.value = Response.Loading
                     }
+
+                    is Response.Success -> {
+                        Log.d("getSupply", storedData.data.toString())
+                        if (storedData.data != null) {
+                            _isCirculatingSupplyLoaded.value = Response.Success(true)
+                            val circulatingSupply = storedData.data
+                            val formatter = DecimalFormat("#,###")
+
+                            _circulatingSupplyState.value =
+                                "${formatter.format(circulatingSupply)} ERG"
+                            _percentMinedState.value = circulatingSupply.div(TOTAL_ERGO_SUPPLY)
+                        }
+
+
+                    }
+
+                    is Response.Failure -> {
+                        _isCirculatingSupplyLoaded.value =
+                            Response.Failure(Exception("Unexpected Error Occurred"))
+                    }
+                }
+            }
+        }
+
+    }
+
+    private fun getCirculatingNetworkSupply() {
+        viewModelScope.launch {
+            ergoPlatformRepository.fetchSupply().collect { response ->
+                when (response) {
 
                     is Response.Success -> {
                         Log.d("getSupply", response.data.toString())
@@ -323,13 +574,13 @@ class MetricsViewModel @Inject constructor(
                         val formatter = DecimalFormat("#,###")
 
                         _circulatingSupplyState.value = "${formatter.format(circulatingSupply)} ERG"
-                        _isCirculatingSupplyLoaded.value = Response.Success(true)
-
                         _percentMinedState.value = circulatingSupply?.div(TOTAL_ERGO_SUPPLY)
+                        _isCirculatingSupplyLoaded.value = Response.Success(true)
+                        ergoPlatformRepository.replaceCirculatingSupply(response.data)
                     }
 
-                    is Response.Failure -> {
-                        _isCirculatingSupplyLoaded.value = Response.Failure(Exception(""))
+                    else -> {
+                        //Do Nothing
                     }
                 }
             }

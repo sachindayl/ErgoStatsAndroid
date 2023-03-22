@@ -1,7 +1,6 @@
 package com.technomatesoftware.ergostats.domain.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -23,12 +22,12 @@ interface CoinGeckoDao {
     @Query("SELECT * FROM coin_market_chart_data")
     suspend fun getMarketChartData(): List<MarketChartDataEntity>
 
-    @Delete
-    fun delete(coinMarketData: CoinMarketDataEntity)
 
     @Query("DELETE FROM coin_market_data")
     suspend fun clearCoinMarketData()
 
     @Query("DELETE FROM coin_market_chart_data")
     suspend fun clearMarketChartData()
+
+
 }

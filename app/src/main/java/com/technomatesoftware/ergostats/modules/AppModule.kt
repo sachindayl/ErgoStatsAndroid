@@ -3,7 +3,10 @@ package com.technomatesoftware.ergostats.modules
 import android.content.Context
 import androidx.room.Room
 import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
-import com.technomatesoftware.ergostats.domain.database.CoinStatsDB
+import com.technomatesoftware.ergostats.domain.dao.ErgoPlatformDao
+import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
+import com.technomatesoftware.ergostats.domain.database.ErgoStatsDB
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_2_3
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
@@ -33,11 +36,13 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun provideCoinStatsDB(@ApplicationContext appContext: Context): CoinStatsDB {
+    fun provideCoinStatsDB(@ApplicationContext appContext: Context): ErgoStatsDB {
         return Room.databaseBuilder(
             appContext,
-            CoinStatsDB::class.java, "ergo-stats"
-        ).build()
+            ErgoStatsDB::class.java, "ergo-stats"
+        )
+            .addMigrations(MIGRATION_2_3)
+            .build()
     }
 
     @Provides
@@ -123,8 +128,18 @@ class AppModule {
     ): TokenJayService = retrofit.create(TokenJayService::class.java)
 
     @Provides
-    fun provideCoinGeckoDao(coinStatsDB: CoinStatsDB): CoinGeckoDao {
-        return coinStatsDB.coinGeckoDao()
+    fun provideCoinGeckoDao(ergoStatsDB: ErgoStatsDB): CoinGeckoDao {
+        return ergoStatsDB.coinGeckoDao()
+    }
+
+    @Provides
+    fun provideErgoWatchDao(ergoStatsDB: ErgoStatsDB): ErgoWatchDao {
+        return ergoStatsDB.ergoWatchDao()
+    }
+
+    @Provides
+    fun provideErgoPlatformDao(ergoStatsDB: ErgoStatsDB): ErgoPlatformDao {
+        return ergoStatsDB.ergoPlatformDao()
     }
 
     @Provides
@@ -139,15 +154,20 @@ class AppModule {
     @Provides
     fun provideErgoWatchRepository(
         ergoWatchService: ErgoWatchService,
+        ergoWatchDao: ErgoWatchDao
     ): ErgoWatchRepository = ErgoWatchRepositoryImpl(
-        ergoWatchService
+        ergoWatchService,
+        ergoWatchDao
     )
 
     @Provides
     fun provideErgoPlatformRepository(
         ergoPlatformService: ErgoPlatformService,
+        ergoPlatformDao: ErgoPlatformDao
+
     ): ErgoPlatformRepository = ErgoPlatformRepositoryImpl(
-        ergoPlatformService
+        ergoPlatformService,
+        ergoPlatformDao
     )
 
 

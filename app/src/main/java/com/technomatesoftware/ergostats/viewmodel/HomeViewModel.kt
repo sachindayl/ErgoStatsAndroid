@@ -1,6 +1,5 @@
 package com.technomatesoftware.ergostats.viewmodel
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -52,18 +51,15 @@ class HomeViewModel @Inject constructor(
                 when (storedData) {
                     is Response.Success -> {
                         if (storedData.data?.isNotEmpty() == true) {
-                            Log.d("coinMarketData", "data collected from db")
                             _coinGeckoState.value = storedData
                         }
                         coinGeckoRepository.getCoinMarketData().collect { response ->
                             when (response) {
                                 is Response.Success -> {
-                                    Log.d("coinMarketData", "data collected from web")
                                     _coinGeckoState.value = response
                                     coinGeckoRepository.replaceCoinMarketData(
                                         response.data ?: emptyList()
                                     )
-                                    Log.d("coinMarketData", "data stored")
                                 }
 
                                 else -> {}
@@ -84,7 +80,6 @@ class HomeViewModel @Inject constructor(
                 when (storedData) {
                     is Response.Success -> {
                         if (storedData.data?.isNotEmpty() == true) {
-                            Log.d("MarketChartData", "data collected from db")
                             val filteredList = filterChartDataSet(storedData.data)
                             _coinGeckoChartEntryState.value =
                                 CustomChartEntryModel(
@@ -97,7 +92,6 @@ class HomeViewModel @Inject constructor(
 
                             when (response) {
                                 is Response.Success -> {
-                                    Log.d("MarketChartData", "data collected from web")
                                     val filteredList =
                                         filterChartDataSet(response.data ?: emptyList())
 
@@ -111,7 +105,6 @@ class HomeViewModel @Inject constructor(
                                     coinGeckoRepository.replaceMarketChartData(
                                         response.data ?: emptyList()
                                     )
-                                    Log.d("MarketChartData", "data stored on db")
                                 }
 
                                 else -> {}

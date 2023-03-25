@@ -1,4 +1,4 @@
-package com.technomatesoftware.ergostats
+package com.technomatesoftware.ergostats.domain.states
 
 import com.technomatesoftware.ergostats.config.EMPTY_STRING
 

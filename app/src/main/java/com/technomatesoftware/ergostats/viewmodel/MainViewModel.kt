@@ -1,7 +1,7 @@
 package com.technomatesoftware.ergostats.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.technomatesoftware.ergostats.MainViewState
+import com.technomatesoftware.ergostats.domain.states.MainViewState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 

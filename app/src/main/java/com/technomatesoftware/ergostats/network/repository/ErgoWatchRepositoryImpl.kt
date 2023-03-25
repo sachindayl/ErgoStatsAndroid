@@ -20,7 +20,8 @@ class ErgoWatchRepositoryImpl @Inject constructor(
     private val ergoWatchService: ErgoWatchService,
     private val ergoWatchDao: ErgoWatchDao,
 ) : ErgoWatchRepository {
-
+    private val storageMultiplier: Int = 10000
+    private val retrievalDivider: Double = 100.0
     override suspend fun fetchSummaryUTXOS(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
             emit(Response.Loading)
@@ -313,14 +314,14 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = metrics.map {
                 SummaryMetricsEntity(
                     label = it.label,
-                    current = it.current.toDouble().times(10000).toLong(),
+                    current = it.current.toDouble().times(storageMultiplier).toLong(),
                     isRelative = true,
                     isP2pks = true,
-                    diff1d = it.diff1d.toDouble().times(10000).toLong(),
-                    diff1w = it.diff1w.toDouble().times(10000).toLong(),
-                    diff4w = it.diff4w.toDouble().times(10000).toLong(),
-                    diff6m = it.diff6m.toDouble().times(10000).toLong(),
-                    diff1y = it.diff1y.toDouble().times(10000).toLong()
+                    diff1d = it.diff1d.toDouble().times(storageMultiplier).toLong(),
+                    diff1w = it.diff1w.toDouble().times(storageMultiplier).toLong(),
+                    diff4w = it.diff4w.toDouble().times(storageMultiplier).toLong(),
+                    diff6m = it.diff6m.toDouble().times(storageMultiplier).toLong(),
+                    diff1y = it.diff1y.toDouble().times(storageMultiplier).toLong()
                 )
             }
             ergoWatchDao.insertMetricsData(metrics = mappedList)
@@ -334,12 +335,12 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = result.map {
                 SummaryMetricsModel(
                     label = it.label,
-                    current = it.current,
-                    diff1d = it.diff1d,
-                    diff1w = it.diff1w,
-                    diff4w = it.diff4w,
-                    diff6m = it.diff6m,
-                    diff1y = it.diff1y
+                    current = it.current.div(retrievalDivider),
+                    diff1d = it.diff1d.div(retrievalDivider),
+                    diff1w = it.diff1w.div(retrievalDivider),
+                    diff4w = it.diff4w.div(retrievalDivider),
+                    diff6m = it.diff6m.div(retrievalDivider),
+                    diff1y = it.diff1y.div(retrievalDivider)
                 )
             }.toList()
             emit(Response.Success(mappedList))
@@ -352,14 +353,14 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = metrics.map {
                 SummaryMetricsEntity(
                     label = it.label,
-                    current = it.current.toDouble().times(10000).toLong(),
+                    current = it.current.toDouble().times(storageMultiplier).toLong(),
                     isRelative = true,
                     isContracts = true,
-                    diff1d = it.diff1d.toDouble().times(10000).toLong(),
-                    diff1w = it.diff1w.toDouble().times(10000).toLong(),
-                    diff4w = it.diff4w.toDouble().times(10000).toLong(),
-                    diff6m = it.diff6m.toDouble().times(10000).toLong(),
-                    diff1y = it.diff1y.toDouble().times(10000).toLong()
+                    diff1d = it.diff1d.toDouble().times(storageMultiplier).toLong(),
+                    diff1w = it.diff1w.toDouble().times(storageMultiplier).toLong(),
+                    diff4w = it.diff4w.toDouble().times(storageMultiplier).toLong(),
+                    diff6m = it.diff6m.toDouble().times(storageMultiplier).toLong(),
+                    diff1y = it.diff1y.toDouble().times(storageMultiplier).toLong()
                 )
             }
             ergoWatchDao.insertMetricsData(metrics = mappedList)
@@ -373,12 +374,12 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = result.map {
                 SummaryMetricsModel(
                     label = it.label,
-                    current = it.current,
-                    diff1d = it.diff1d,
-                    diff1w = it.diff1w,
-                    diff4w = it.diff4w,
-                    diff6m = it.diff6m,
-                    diff1y = it.diff1y
+                    current = it.current.div(retrievalDivider),
+                    diff1d = it.diff1d.div(retrievalDivider),
+                    diff1w = it.diff1w.div(retrievalDivider),
+                    diff4w = it.diff4w.div(retrievalDivider),
+                    diff6m = it.diff6m.div(retrievalDivider),
+                    diff1y = it.diff1y.div(retrievalDivider)
                 )
             }.toList()
             emit(Response.Success(mappedList))

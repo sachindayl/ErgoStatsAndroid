@@ -101,8 +101,7 @@ fun AddressesList(
                         value = summaryItems.value,
                         cardDetails = summaryItems.dataSet,
                         onClick = {
-                            mainViewModel.setTitle("Metrics Details")
-                            navController.navigate(Routes.METRICS_DETAILS.value)
+                            navController.navigate("${Routes.METRICS_DETAILS.value}/${summaryItems.id.value}")
                         }
                     )
                 }
@@ -226,7 +225,9 @@ fun SupplyDistribution(metricsViewModel: MetricsViewModel, navController: NavCon
                         subtitle = supplyDistribution.subtitle,
                         value = supplyDistribution.value,
                         cardDetails = supplyDistribution.dataSet,
-                        onClick = { navController.navigate(Routes.METRICS_DETAILS.value) }
+                        onClick = {
+                            navController.navigate("${Routes.METRICS_DETAILS.value}/${supplyDistribution.id.value}")
+                        }
                     )
                 }
             }
@@ -272,7 +273,7 @@ fun UsageContainer(metricsViewModel: MetricsViewModel, navController: NavControl
                         value = usageData.value,
                         subtitle = usageData.subtitle,
                         cardDetails = usageData.dataSet,
-                        onClick = { navController.navigate(Routes.METRICS_DETAILS.value) }
+                        onClick = { navController.navigate("${Routes.METRICS_DETAILS.value}/${usageData.id.value}") }
                     )
                 }
             }

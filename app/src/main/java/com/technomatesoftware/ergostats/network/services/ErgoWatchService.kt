@@ -3,6 +3,8 @@ package com.technomatesoftware.ergostats.network.services
 import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
+import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
+import com.technomatesoftware.ergostats.domain.models.UsageChartDataModel
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -40,4 +42,21 @@ interface ErgoWatchService {
         @Query("r") timeWindowResolution: String,
         @Query("ergusd") priceData: Boolean,
     ): AddressChartDataModel
+
+    @GET("metrics/{usage_type}")
+    suspend fun fetchUsageChartData(
+        @Path("usage_type") usageType: String,
+        @Query("fr") startTime: Long,
+        @Query("to") endTime: Long,
+        @Query("r") timeWindowResolution: String,
+        @Query("ergusd") priceData: Boolean,
+    ): UsageChartDataModel
+
+    @GET("metrics/utxos")
+    suspend fun fetchUsageUTXOChartData(
+        @Query("fr") startTime: Long,
+        @Query("to") endTime: Long,
+        @Query("r") timeWindowResolution: String,
+        @Query("ergusd") priceData: Boolean,
+    ): UTXOChartDataModel
 }

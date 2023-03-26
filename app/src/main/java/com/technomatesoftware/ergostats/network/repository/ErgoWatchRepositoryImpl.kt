@@ -6,6 +6,8 @@ import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
+import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
+import com.technomatesoftware.ergostats.domain.models.UsageChartDataModel
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
 import com.technomatesoftware.ergostats.network.services.ErgoWatchService
 import kotlinx.coroutines.Dispatchers
@@ -433,5 +435,47 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             emit(Response.Success(result))
         }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
+    override suspend fun fetchSummaryTransactionsChartData(): Flow<Response<UsageChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchUsageChartData(
+                usageType = "transactions",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
+    override suspend fun fetchSummaryUTXOsChartData(): Flow<Response<UTXOChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchUsageUTXOChartData(
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryVolumeChartData(): Flow<Response<UsageChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchUsageChartData(
+                usageType = "volume",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 }

@@ -28,7 +28,10 @@ fun CustomChart(
             )
         ),
         chartModelProducer = chartConfigModel.chartEntryModelProducer as ChartModelProducer<ChartEntryModel>,
-        endAxis = endAxis(
+        endAxis = if (chartConfigModel.endAxisValueFormatter != null) endAxis(
+            maxLabelCount = 5,
+            valueFormatter = chartConfigModel.endAxisValueFormatter,
+        ) else endAxis(
             maxLabelCount = 5,
         ),
         bottomAxis = chartConfigModel.bottomAxisValueFormatter?.let { formatter ->

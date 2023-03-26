@@ -4,6 +4,8 @@ import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
+import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
+import com.technomatesoftware.ergostats.domain.models.UsageChartDataModel
 import kotlinx.coroutines.flow.Flow
 
 interface ErgoWatchRepository {
@@ -34,4 +36,7 @@ interface ErgoWatchRepository {
     suspend fun fetchSummaryP2pkChartData(): Flow<Response<AddressChartDataModel>>
     suspend fun fetchSummaryContractsChartData(): Flow<Response<AddressChartDataModel>>
     suspend fun fetchSummaryMinersChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun fetchSummaryTransactionsChartData(): Flow<Response<UsageChartDataModel>>
+    suspend fun fetchSummaryUTXOsChartData(): Flow<Response<UTXOChartDataModel>>
+    suspend fun fetchSummaryVolumeChartData(): Flow<Response<UsageChartDataModel>>
 }

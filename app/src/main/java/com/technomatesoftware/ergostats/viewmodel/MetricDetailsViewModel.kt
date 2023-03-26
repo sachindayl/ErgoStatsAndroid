@@ -33,6 +33,7 @@ class MetricDetailsViewModel @Inject constructor(
     val viewState: StateFlow<MetricDetailsViewState> = _viewState
     private val _metricTypeState =
         mutableStateOf(MetricsRetrievalModel.ADDRESS_P2PK)
+    private val dateFilterModulus = 6
 //    val metricTypeState: State<MetricsRetrievalModel> = _metricTypeState
 
 
@@ -160,6 +161,9 @@ class MetricDetailsViewModel @Inject constructor(
             MetricsRetrievalModel.ADDRESS_P2PK -> fetchSummaryP2pkNetworkChartData()
             MetricsRetrievalModel.ADDRESS_CONTRACTS -> fetchSummaryContractsNetworkChartData()
             MetricsRetrievalModel.ADDRESS_MINING -> fetchSummaryMinersNetworkChartData()
+            MetricsRetrievalModel.USAGE_TRANSACTIONS -> fetchSummaryTransactionsNetworkChartData()
+            MetricsRetrievalModel.USAGE_VOLUME -> fetchSummaryVolumeNetworkChartData()
+            MetricsRetrievalModel.USAGE_UTXO -> fetchSummaryUTXOsNetworkChartData()
             else -> {
                 setChartData(null)
             }
@@ -178,7 +182,7 @@ class MetricDetailsViewModel @Inject constructor(
                             val timeStampsList = response.data.timestamps.reversed()
                             val dataList = response.data.greaterThan1Erg.reversed()
                             timeStampsList.forEachIndexed { index, timestamp ->
-                                if (index == timeStampsList.size - 1 || (index + 1) % 7 == 0) {
+                                if (index == timeStampsList.size - 1 || (index + 1) % dateFilterModulus == 0) {
                                     dataWithTimestamps.add(
                                         0, mutableListOf(
                                             timestamp.toDouble(),
@@ -192,7 +196,6 @@ class MetricDetailsViewModel @Inject constructor(
                                 CustomChartEntryModel(
                                     chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
                                     bottomAxisValueFormatter = buildChartBottomAxisValues(),
-                                    endAxisValueFormatter = buildChartEndAxisValues()
                                 )
                             )
 
@@ -220,7 +223,7 @@ class MetricDetailsViewModel @Inject constructor(
                             val timeStampsList = response.data.timestamps.reversed()
                             val dataList = response.data.greaterThan1Erg.reversed()
                             timeStampsList.forEachIndexed { index, timestamp ->
-                                if (index == timeStampsList.size - 1 || (index + 1) % 7 == 0) {
+                                if (index == timeStampsList.size - 1 || (index + 1) % dateFilterModulus == 0) {
                                     dataWithTimestamps.add(
                                         0, mutableListOf(
                                             timestamp.toDouble(),
@@ -234,7 +237,6 @@ class MetricDetailsViewModel @Inject constructor(
                                 CustomChartEntryModel(
                                     chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
                                     bottomAxisValueFormatter = buildChartBottomAxisValues(),
-                                    endAxisValueFormatter = buildChartEndAxisValues()
                                 )
                             )
 
@@ -262,7 +264,7 @@ class MetricDetailsViewModel @Inject constructor(
                             val timeStampsList = response.data.timestamps.reversed()
                             val dataList = response.data.greaterThan1Erg.reversed()
                             timeStampsList.forEachIndexed { index, timestamp ->
-                                if (index == timeStampsList.size - 1 || (index + 1) % 7 == 0) {
+                                if (index == timeStampsList.size - 1 || (index + 1) % dateFilterModulus == 0) {
                                     dataWithTimestamps.add(
                                         0, mutableListOf(
                                             timestamp.toDouble(),
@@ -276,7 +278,129 @@ class MetricDetailsViewModel @Inject constructor(
                                 CustomChartEntryModel(
                                     chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
                                     bottomAxisValueFormatter = buildChartBottomAxisValues(),
-                                    endAxisValueFormatter = buildChartEndAxisValues()
+                                )
+                            )
+
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchSummaryTransactionsNetworkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchSummaryTransactionsChartData().collect { response ->
+
+                when (response) {
+
+                    is Response.Success -> {
+                        if (response.data?.timestamps?.isNotEmpty() == true && response.data.daily1day.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timeStampsList = response.data.timestamps.reversed()
+                            val dataList = response.data.daily1day.reversed()
+                            timeStampsList.forEachIndexed { index, timestamp ->
+                                if (index == timeStampsList.size - 1 || (index + 1) % dateFilterModulus == 0) {
+                                    dataWithTimestamps.add(
+                                        0, mutableListOf(
+                                            timestamp.toDouble(),
+                                            dataList[index].toDouble()
+                                        )
+                                    )
+                                }
+
+                            }
+                            setChartData(
+                                CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues(),
+                                )
+                            )
+
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchSummaryVolumeNetworkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchSummaryVolumeChartData().collect { response ->
+
+                when (response) {
+
+                    is Response.Success -> {
+                        if (response.data?.timestamps?.isNotEmpty() == true && response.data.daily1day.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timeStampsList = response.data.timestamps.reversed()
+                            val dataList = response.data.daily1day.reversed()
+                            timeStampsList.forEachIndexed { index, timestamp ->
+                                if (index == timeStampsList.size - 1 || (index + 1) % dateFilterModulus == 0) {
+                                    dataWithTimestamps.add(
+                                        0, mutableListOf(
+                                            timestamp.toDouble(),
+                                            dataList[index].toDouble()
+                                        )
+                                    )
+                                }
+
+                            }
+                            setChartData(
+                                CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues()
+                                )
+                            )
+
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchSummaryUTXOsNetworkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchSummaryUTXOsChartData().collect { response ->
+
+                when (response) {
+
+                    is Response.Success -> {
+                        if (response.data?.timestamps?.isNotEmpty() == true && response.data.values.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timeStampsList = response.data.timestamps.reversed()
+                            val dataList = response.data.values.reversed()
+                            timeStampsList.forEachIndexed { index, timestamp ->
+                                if (index == timeStampsList.size - 1 || (index + 1) % dateFilterModulus == 0) {
+                                    dataWithTimestamps.add(
+                                        0, mutableListOf(
+                                            timestamp.toDouble(),
+                                            dataList[index].toDouble()
+                                        )
+                                    )
+                                }
+
+                            }
+                            setChartData(
+                                CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues(),
                                 )
                             )
 
@@ -317,10 +441,24 @@ class MetricDetailsViewModel @Inject constructor(
                 .orEmpty()
         }
 
-    private fun buildChartEndAxisValues(): AxisValueFormatter<AxisPosition.Vertical.End> =
-        AxisValueFormatter { value, chartValues ->
-            val roundedValue = (chartValues.chartEntryModel.entries.first()
-                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toInt()
-            roundedValue.toString()
-        }
+//    private fun buildChartEndAxisValues(): AxisValueFormatter<AxisPosition.Vertical.End> =
+//        AxisValueFormatter { value, chartValues ->
+//            val roundedValue = (chartValues.chartEntryModel.entries.first()
+//                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toInt()
+//            roundedValue.toString()
+//        }
+//
+//    private fun buildChartEndAxisValues2(): AxisValueFormatter<AxisPosition.Vertical.End> =
+//        AxisValueFormatter { value, chartValues ->
+//            val roundedValue = (chartValues.chartEntryModel.entries.first()
+//                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toLong()
+//            roundedValue.toString()
+//        }
+//
+//    private fun buildChartEndAxisValues3(): AxisValueFormatter<AxisPosition.Vertical.End> =
+//        AxisValueFormatter { value, chartValues ->
+//            val roundedValue = (chartValues.chartEntryModel.entries.first()
+//                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toLong()
+//            return@AxisValueFormatter roundedValue.toString()
+//        }
 }

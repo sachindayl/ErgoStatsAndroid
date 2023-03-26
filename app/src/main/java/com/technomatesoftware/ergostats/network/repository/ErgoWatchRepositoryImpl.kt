@@ -2,6 +2,7 @@ package com.technomatesoftware.ergostats.network.repository
 
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
 import com.technomatesoftware.ergostats.domain.entities.SummaryMetricsEntity
+import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
@@ -12,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -383,6 +386,20 @@ class ErgoWatchRepositoryImpl @Inject constructor(
                 )
             }.toList()
             emit(Response.Success(mappedList))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryP2pkChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryP2pkChartData(
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
         }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
 

@@ -1,8 +1,10 @@
 package com.technomatesoftware.ergostats.network.services
 
+import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ErgoWatchService {
     @GET("metrics/summary/utxos")
@@ -28,4 +30,12 @@ interface ErgoWatchService {
 
     @GET("metrics/summary/supply/distribution/contracts")
     suspend fun fetchSupplyDistributionContracts(): SupplyDistributionModel
+
+    @GET("metrics/addresses/p2pk")
+    suspend fun fetchSummaryP2pkChartData(
+        @Query("fr") startTime: Long,
+        @Query("to") endTime: Long,
+        @Query("r") timeWindowResolution: String,
+        @Query("ergusd") priceData: Boolean,
+    ): AddressChartDataModel
 }

@@ -1,5 +1,6 @@
 package com.technomatesoftware.ergostats.network.interfaces
 
+import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
@@ -30,4 +31,5 @@ interface ErgoWatchRepository {
     suspend fun fetchStoredSupplyDistributionP2pk(): Flow<Response<List<SummaryMetricsModel>>>
     suspend fun replaceSupplyDistributionContracts(metrics: List<SummaryMetricsModel>)
     suspend fun fetchStoredSupplyDistributionContracts(): Flow<Response<List<SummaryMetricsModel>>>
+    suspend fun fetchSummaryP2pkChartData(): Flow<Response<AddressChartDataModel>>
 }

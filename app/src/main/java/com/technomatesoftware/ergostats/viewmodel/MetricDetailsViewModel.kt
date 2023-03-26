@@ -3,7 +3,13 @@ package com.technomatesoftware.ergostats.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.patrykandpatrick.vico.core.axis.AxisPosition
+import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
+import com.patrykandpatrick.vico.core.entry.ChartEntry
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.technomatesoftware.ergostats.config.NumberFormatter
+import com.technomatesoftware.ergostats.domain.models.CustomChartAxisModel
+import com.technomatesoftware.ergostats.domain.models.CustomChartEntryModel
 import com.technomatesoftware.ergostats.domain.models.MetricsRetrievalModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
@@ -13,6 +19,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -145,4 +154,71 @@ class MetricDetailsViewModel @Inject constructor(
         }
         _viewState.value = _viewState.value.copy(isTableVisible = isTableVisible)
     }
+
+    fun fetchSummaryP2pkNetworkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchSummaryP2pkChartData().collect { response ->
+
+                when (response) {
+
+                    is Response.Success -> {
+                        if (response.data?.timestamps?.isNotEmpty() == true && response.data.greaterThan1Erg.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timeStampsList = response.data.timestamps.reversed()
+                            val dataList = response.data.greaterThan1Erg.reversed()
+                            timeStampsList.forEachIndexed { index, timestamp ->
+                                if (index == timeStampsList.size - 1 || (index + 1) % 7 == 0) {
+                                    dataWithTimestamps.add(
+                                        0, mutableListOf(
+                                            timestamp.toDouble(),
+                                            dataList[index].toDouble()
+                                        )
+                                    )
+                                }
+
+                            }
+                            _viewState.value = _viewState.value.copy(
+                                chartConfig = CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues(),
+                                    endAxisValueFormatter = buildChartEndAxisValues()
+                                )
+                            )
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+        }
+    }
+
+    private fun produceChartEntryModel(dataSet: List<List<Double>>): ChartEntryModelProducer =
+        dataSet.mapIndexed { index, data ->
+            val date = SimpleDateFormat("MMM d", Locale.getDefault()).format(
+                Date(data.first().toLong())
+            )
+            CustomChartAxisModel(
+                date,
+                index.toFloat(),
+                data[1].toFloat()
+            )
+        }.let { ChartEntryModelProducer(it as List<ChartEntry>) }
+
+    private fun buildChartBottomAxisValues(): AxisValueFormatter<AxisPosition.Horizontal.Bottom> =
+        AxisValueFormatter { value, chartValues ->
+            (chartValues.chartEntryModel.entries.first()
+                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.formattedDate
+                .orEmpty()
+        }
+
+    private fun buildChartEndAxisValues(): AxisValueFormatter<AxisPosition.Vertical.End> =
+        AxisValueFormatter { value, chartValues ->
+            val roundedValue = (chartValues.chartEntryModel.entries.first()
+                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toInt()
+            roundedValue.toString()
+        }
 }

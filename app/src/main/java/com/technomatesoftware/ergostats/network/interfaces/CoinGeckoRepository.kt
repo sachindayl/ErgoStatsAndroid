@@ -9,6 +9,6 @@ interface CoinGeckoRepository {
     suspend fun getStoredCoinMarketData(): Flow<Response<List<CoinMarketDataModel>>>
     suspend fun replaceCoinMarketData(coinMarketDataList: List<CoinMarketDataModel>)
     suspend fun replaceMarketChartData(chartDataList: List<List<Double>>)
-    suspend fun getStoredMarketChartData() : Flow<Response<List<List<Double>>>>
+    suspend fun getStoredMarketChartData(): Flow<Response<List<List<Double>>>>
     suspend fun getCoinMarketPriceChartData(): Flow<Response<List<List<Double>>>>
 }

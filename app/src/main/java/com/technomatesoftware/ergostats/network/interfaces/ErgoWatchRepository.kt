@@ -32,4 +32,6 @@ interface ErgoWatchRepository {
     suspend fun replaceSupplyDistributionContracts(metrics: List<SummaryMetricsModel>)
     suspend fun fetchStoredSupplyDistributionContracts(): Flow<Response<List<SummaryMetricsModel>>>
     suspend fun fetchSummaryP2pkChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun fetchSummaryContractsChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun fetchSummaryMinersChartData(): Flow<Response<AddressChartDataModel>>
 }

@@ -155,7 +155,18 @@ class MetricDetailsViewModel @Inject constructor(
         _viewState.value = _viewState.value.copy(isTableVisible = isTableVisible)
     }
 
-    fun fetchSummaryP2pkNetworkChartData() {
+    fun fetchChartData() {
+        when (_metricTypeState.value) {
+            MetricsRetrievalModel.ADDRESS_P2PK -> fetchSummaryP2pkNetworkChartData()
+            MetricsRetrievalModel.ADDRESS_CONTRACTS -> fetchSummaryContractsNetworkChartData()
+            MetricsRetrievalModel.ADDRESS_MINING -> fetchSummaryMinersNetworkChartData()
+            else -> {
+                setChartData(null)
+            }
+        }
+    }
+
+    private fun fetchSummaryP2pkNetworkChartData() {
         viewModelScope.launch {
             ergoWatchRepository.fetchSummaryP2pkChartData().collect { response ->
 
@@ -177,13 +188,14 @@ class MetricDetailsViewModel @Inject constructor(
                                 }
 
                             }
-                            _viewState.value = _viewState.value.copy(
-                                chartConfig = CustomChartEntryModel(
+                            setChartData(
+                                CustomChartEntryModel(
                                     chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
                                     bottomAxisValueFormatter = buildChartBottomAxisValues(),
                                     endAxisValueFormatter = buildChartEndAxisValues()
                                 )
                             )
+
                         }
 
                     }
@@ -194,6 +206,96 @@ class MetricDetailsViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun fetchSummaryContractsNetworkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchSummaryContractsChartData().collect { response ->
+
+                when (response) {
+
+                    is Response.Success -> {
+                        if (response.data?.timestamps?.isNotEmpty() == true && response.data.greaterThan1Erg.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timeStampsList = response.data.timestamps.reversed()
+                            val dataList = response.data.greaterThan1Erg.reversed()
+                            timeStampsList.forEachIndexed { index, timestamp ->
+                                if (index == timeStampsList.size - 1 || (index + 1) % 7 == 0) {
+                                    dataWithTimestamps.add(
+                                        0, mutableListOf(
+                                            timestamp.toDouble(),
+                                            dataList[index].toDouble()
+                                        )
+                                    )
+                                }
+
+                            }
+                            setChartData(
+                                CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues(),
+                                    endAxisValueFormatter = buildChartEndAxisValues()
+                                )
+                            )
+
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchSummaryMinersNetworkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchSummaryMinersChartData().collect { response ->
+
+                when (response) {
+
+                    is Response.Success -> {
+                        if (response.data?.timestamps?.isNotEmpty() == true && response.data.greaterThan1Erg.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timeStampsList = response.data.timestamps.reversed()
+                            val dataList = response.data.greaterThan1Erg.reversed()
+                            timeStampsList.forEachIndexed { index, timestamp ->
+                                if (index == timeStampsList.size - 1 || (index + 1) % 7 == 0) {
+                                    dataWithTimestamps.add(
+                                        0, mutableListOf(
+                                            timestamp.toDouble(),
+                                            dataList[index].toDouble()
+                                        )
+                                    )
+                                }
+
+                            }
+                            setChartData(
+                                CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues(),
+                                    endAxisValueFormatter = buildChartEndAxisValues()
+                                )
+                            )
+
+                        }
+
+                    }
+
+                    else -> {
+                        //Do Nothing
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setChartData(chartConfigData: CustomChartEntryModel?) {
+        _viewState.value = _viewState.value.copy(
+            chartConfig = chartConfigData
+        )
     }
 
     private fun produceChartEntryModel(dataSet: List<List<Double>>): ChartEntryModelProducer =

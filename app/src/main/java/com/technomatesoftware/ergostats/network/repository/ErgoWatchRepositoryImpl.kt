@@ -393,7 +393,38 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val currentDate = LocalDateTime.now()
             val dateOneMonthAgo = currentDate.minusMonths(1)
             emit(Response.Loading)
-            val result = ergoWatchService.fetchSummaryP2pkChartData(
+            val result = ergoWatchService.fetchSummaryAddressChartData(
+                addressType = "p2pk",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryContractsChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryAddressChartData(
+                addressType = "contracts",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryMinersChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryAddressChartData(
+                addressType = "miners",
                 startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
                 endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
                 timeWindowResolution = "24h",

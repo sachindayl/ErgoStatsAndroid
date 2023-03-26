@@ -43,7 +43,7 @@ fun MetricsDetailsView(
         metricsDetailsViewModel.getDataDescription()
         metricsDetailsViewModel.getChartVisibility()
         metricsDetailsViewModel.getTableVisibility()
-        metricsDetailsViewModel.fetchSummaryP2pkNetworkChartData()
+        metricsDetailsViewModel.fetchChartData()
     }
 
     MetricsDetailsBody(

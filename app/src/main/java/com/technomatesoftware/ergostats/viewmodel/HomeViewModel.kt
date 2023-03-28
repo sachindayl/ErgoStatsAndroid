@@ -15,7 +15,6 @@ import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -84,8 +83,7 @@ class HomeViewModel @Inject constructor(
                             _coinGeckoChartEntryState.value =
                                 CustomChartEntryModel(
                                     produceChartEntryModel(filteredList),
-                                    buildChartBottomAxisValues(),
-                                    buildChartEndAxisValues()
+                                    buildChartBottomAxisValues()
                                 )
                         }
                         coinGeckoRepository.getCoinMarketPriceChartData().collect { response ->
@@ -98,8 +96,7 @@ class HomeViewModel @Inject constructor(
                                     _coinGeckoChartEntryState.value =
                                         CustomChartEntryModel(
                                             produceChartEntryModel(filteredList),
-                                            buildChartBottomAxisValues(),
-                                            buildChartEndAxisValues()
+                                            buildChartBottomAxisValues()
                                         )
 
                                     coinGeckoRepository.replaceMarketChartData(
@@ -145,11 +142,11 @@ class HomeViewModel @Inject constructor(
                 .orEmpty()
         }
 
-    private fun buildChartEndAxisValues(): AxisValueFormatter<AxisPosition.Vertical.End> =
-        AxisValueFormatter { value, chartValues ->
-            val roundedValue = (chartValues.chartEntryModel.entries.first()
-                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toBigDecimal()
-                ?.setScale(2, RoundingMode.HALF_UP)
-            roundedValue.toString()
-        }
+//    private fun buildChartEndAxisValues(): AxisValueFormatter<AxisPosition.Vertical.End> =
+//        AxisValueFormatter { value, chartValues ->
+//            val roundedValue = (chartValues.chartEntryModel.entries.first()
+//                .getOrNull(value.toInt()) as? CustomChartAxisModel)?.y?.toBigDecimal()
+//                ?.setScale(2, RoundingMode.HALF_UP)
+//            roundedValue.toString()
+//        }
 }

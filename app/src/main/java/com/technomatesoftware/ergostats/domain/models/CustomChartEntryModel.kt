@@ -7,5 +7,5 @@ import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 data class CustomChartEntryModel(
     val chartEntryModelProducer: ChartEntryModelProducer?,
     val bottomAxisValueFormatter: AxisValueFormatter<AxisPosition.Horizontal.Bottom>?,
-    val endAxisValueFormatter: AxisValueFormatter<AxisPosition.Vertical.End>?,
+    val endAxisValueFormatter: AxisValueFormatter<AxisPosition.Vertical.End>? = null,
 )

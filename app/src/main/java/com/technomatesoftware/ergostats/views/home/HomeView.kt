@@ -76,9 +76,7 @@ fun HomeView(
                 coinStats.data?.first()?.let {
 
                     CustomChart(
-                        chartData = homeViewModel.coinGeckoChartEntryState.value.chartEntryModelProducer,
-                        bottomAxisLabels = homeViewModel.coinGeckoChartEntryState.value.bottomAxisValueFormatter,
-                        height = 350.dp
+                        chartConfigModel = homeViewModel.coinGeckoChartEntryState.value
                     )
 
                     Heading(PaddingValues(horizontal = 16.dp), "Summary")

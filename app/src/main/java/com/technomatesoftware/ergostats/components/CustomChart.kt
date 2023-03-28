@@ -10,15 +10,16 @@ import com.patrykandpatrick.vico.compose.axis.horizontal.bottomAxis
 import com.patrykandpatrick.vico.compose.axis.vertical.endAxis
 import com.patrykandpatrick.vico.compose.chart.Chart
 import com.patrykandpatrick.vico.compose.chart.line.lineChart
-import com.patrykandpatrick.vico.core.axis.AxisPosition
-import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.chart.values.AxisValuesOverrider
 import com.patrykandpatrick.vico.core.entry.ChartEntryModel
-import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.patrykandpatrick.vico.core.entry.ChartModelProducer
+import com.technomatesoftware.ergostats.domain.models.CustomChartEntryModel
 
 @Composable
-fun CustomChart(chartData: ChartEntryModelProducer?, bottomAxisLabels: AxisValueFormatter<AxisPosition.Horizontal.Bottom>?, height: Dp = 350.dp) {
+fun CustomChart(
+    chartConfigModel: CustomChartEntryModel,
+    height: Dp = 350.dp
+) {
     Chart(
         chart = lineChart(
             axisValuesOverrider = AxisValuesOverrider.adaptiveYValues(
@@ -26,11 +27,14 @@ fun CustomChart(chartData: ChartEntryModelProducer?, bottomAxisLabels: AxisValue
                 round = false
             )
         ),
-        chartModelProducer = chartData as ChartModelProducer<ChartEntryModel>,
-        endAxis = endAxis(
+        chartModelProducer = chartConfigModel.chartEntryModelProducer as ChartModelProducer<ChartEntryModel>,
+        endAxis = if (chartConfigModel.endAxisValueFormatter != null) endAxis(
+            maxLabelCount = 5,
+            valueFormatter = chartConfigModel.endAxisValueFormatter,
+        ) else endAxis(
             maxLabelCount = 5,
         ),
-        bottomAxis = bottomAxisLabels?.let { formatter ->
+        bottomAxis = chartConfigModel.bottomAxisValueFormatter?.let { formatter ->
             bottomAxis(
                 valueFormatter = formatter,
             )

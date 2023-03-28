@@ -2,11 +2,12 @@ package com.technomatesoftware.ergostats.modules
 
 import android.content.Context
 import androidx.room.Room
+import com.technomatesoftware.ergostats.config.NumberFormatter
 import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoPlatformDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
 import com.technomatesoftware.ergostats.domain.database.ErgoStatsDB
-import com.technomatesoftware.ergostats.domain.database.MIGRATION_2_3
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_3_4
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
@@ -36,12 +37,18 @@ class AppModule {
 
     @Provides
     @Singleton
+    fun provideNumberFormatter(): NumberFormatter {
+        return NumberFormatter()
+    }
+
+    @Provides
+    @Singleton
     fun provideCoinStatsDB(@ApplicationContext appContext: Context): ErgoStatsDB {
         return Room.databaseBuilder(
             appContext,
             ErgoStatsDB::class.java, "ergo-stats"
         )
-            .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
             .build()
     }
 

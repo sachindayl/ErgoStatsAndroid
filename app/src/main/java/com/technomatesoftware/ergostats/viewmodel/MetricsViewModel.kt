@@ -258,7 +258,7 @@ class MetricsViewModel @Inject constructor(
                                     title = "Contracts",
                                     subtitle = "Top 1%",
                                     numberFormatter.toPercentWithDecimals(
-                                        distributionData.first().current.toDouble().div(100),
+                                        distributionData.first().current.toDouble(),
                                         2
                                     ),
                                     distributionData
@@ -290,7 +290,7 @@ class MetricsViewModel @Inject constructor(
                                     "P2PKs",
                                     "Top 1%",
                                     numberFormatter.toPercentWithDecimals(
-                                        distributionData.first().current.toDouble().div(100), 2
+                                        distributionData.first().current.toDouble(), 2
                                     ),
                                     distributionData
                                 )

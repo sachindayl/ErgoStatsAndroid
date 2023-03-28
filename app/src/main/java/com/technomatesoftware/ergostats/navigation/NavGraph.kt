@@ -19,10 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.technomatesoftware.ergostats.MainViewState
+import androidx.navigation.navArgument
+import com.technomatesoftware.ergostats.domain.states.MainViewState
 import com.technomatesoftware.ergostats.components.BottomNavigationBar
+import com.technomatesoftware.ergostats.domain.models.MetricsRetrievalModel
 import com.technomatesoftware.ergostats.domain.models.Routes
 import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 import com.technomatesoftware.ergostats.views.ageusd.AgeUsdView
@@ -90,10 +93,11 @@ fun NavGraph(
             composable(Routes.AGE_USD.value) {
                 AgeUsdView(padding = padding)
             }
-            composable("${Routes.METRICS_DETAILS.value}/{metricId}") { backStackEntry ->
+            composable("${Routes.METRICS_DETAILS.value}/{metricsRetrievalId}", arguments = listOf(navArgument("metricsRetrievalId") { type = NavType.IntType })) { backStackEntry ->
+                val metricId = backStackEntry.arguments?.getInt("metricsRetrievalId") ?: 0
                 MetricsDetailsView(
                     padding = padding,
-                    metricId = backStackEntry.arguments?.getInt("metricId")
+                    metricsRetrievalId = MetricsRetrievalModel.values().getOrNull(metricId)
                 )
             }
         }

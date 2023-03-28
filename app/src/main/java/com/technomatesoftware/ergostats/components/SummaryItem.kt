@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,8 +21,8 @@ import com.technomatesoftware.ergostats.ui.theme.WrongRed
 @Composable
 fun SummaryItem(title: String, value1: String?, value2: String? = null) {
     Column(Modifier.padding(4.dp)) {
-        Text(text = title, fontSize = 18.sp)
-        Text(text = value1 ?: EMPTY_STRING, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+        Text(text = title, style = MaterialTheme.typography.titleSmall)
+        Text(text = value1 ?: EMPTY_STRING, style = MaterialTheme.typography.titleLarge)
         if (value2 != null) {
             if (value2.toDouble() > 0.0) {
                 Row {

@@ -6,6 +6,7 @@ import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoPlatformDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
 import com.technomatesoftware.ergostats.domain.entities.CoinMarketDataEntity
+import com.technomatesoftware.ergostats.domain.entities.MetricsChartDataEntity
 import com.technomatesoftware.ergostats.domain.entities.MarketChartDataEntity
 import com.technomatesoftware.ergostats.domain.entities.SummaryMetricsEntity
 import com.technomatesoftware.ergostats.domain.entities.TokenSupplyEntity
@@ -15,9 +16,10 @@ import com.technomatesoftware.ergostats.domain.entities.TokenSupplyEntity
         CoinMarketDataEntity::class,
         MarketChartDataEntity::class,
         SummaryMetricsEntity::class,
-        TokenSupplyEntity::class
+        TokenSupplyEntity::class,
+        MetricsChartDataEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 abstract class ErgoStatsDB : RoomDatabase() {

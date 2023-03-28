@@ -87,7 +87,7 @@ class CoinGeckoRepositoryImpl @Inject constructor(
         }.flowOn(Dispatchers.IO)
 
     override suspend fun replaceCoinMarketData(coinMarketDataList: List<CoinMarketDataModel>) {
-        if(coinMarketDataList.isNotEmpty()) {
+        if (coinMarketDataList.isNotEmpty()) {
             val item = coinMarketDataList.first()
             coinGeckoDao.clearCoinMarketData()
             coinGeckoDao.insertCoinMarketData(item.toCoinMarketDataEntity())
@@ -95,7 +95,7 @@ class CoinGeckoRepositoryImpl @Inject constructor(
     }
 
     override suspend fun replaceMarketChartData(chartDataList: List<List<Double>>) {
-        if (chartDataList.isNotEmpty()) {
+        if (chartDataList.first().isNotEmpty()) {
             val mappedDataList = chartDataList.map {
                 MarketChartDataEntity(date = it.first().toLong(), price = it[1])
             }.toList()

@@ -1,8 +1,11 @@
 package com.technomatesoftware.ergostats.network.interfaces
 
+import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
+import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
+import com.technomatesoftware.ergostats.domain.models.UsageChartDataModel
 import kotlinx.coroutines.flow.Flow
 
 interface ErgoWatchRepository {
@@ -30,4 +33,16 @@ interface ErgoWatchRepository {
     suspend fun fetchStoredSupplyDistributionP2pk(): Flow<Response<List<SummaryMetricsModel>>>
     suspend fun replaceSupplyDistributionContracts(metrics: List<SummaryMetricsModel>)
     suspend fun fetchStoredSupplyDistributionContracts(): Flow<Response<List<SummaryMetricsModel>>>
+    suspend fun fetchSummaryP2pkChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun fetchSummaryContractsChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun fetchSummaryMinersChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun fetchSummaryTransactionsChartData(): Flow<Response<UsageChartDataModel>>
+    suspend fun fetchSummaryUTXOsChartData(): Flow<Response<UTXOChartDataModel>>
+    suspend fun fetchSummaryVolumeChartData(): Flow<Response<UsageChartDataModel>>
+    suspend fun fetchStoredP2PKChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun replaceStoredP2PKChartData(chartData: AddressChartDataModel)
+    suspend fun fetchStoredContractsChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun replaceStoredContractsChartData(chartData: AddressChartDataModel)
+    suspend fun fetchStoredMiningChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun replaceStoredMiningChartData(chartData: AddressChartDataModel)
 }

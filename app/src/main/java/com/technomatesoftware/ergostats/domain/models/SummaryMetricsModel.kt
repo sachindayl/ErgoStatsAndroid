@@ -14,4 +14,4 @@ data class SummaryMetricsModel(
     val diff6m: Number,
     @SerializedName("diff_1y")
     val diff1y: Number,
-    )
+)

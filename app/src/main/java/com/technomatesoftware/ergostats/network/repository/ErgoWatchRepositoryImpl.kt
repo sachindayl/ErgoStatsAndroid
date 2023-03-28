@@ -1,10 +1,14 @@
 package com.technomatesoftware.ergostats.network.repository
 
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
+import com.technomatesoftware.ergostats.domain.entities.MetricsChartDataEntity
 import com.technomatesoftware.ergostats.domain.entities.SummaryMetricsEntity
+import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
+import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
+import com.technomatesoftware.ergostats.domain.models.UsageChartDataModel
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
 import com.technomatesoftware.ergostats.network.services.ErgoWatchService
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +16,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,7 +26,8 @@ class ErgoWatchRepositoryImpl @Inject constructor(
     private val ergoWatchService: ErgoWatchService,
     private val ergoWatchDao: ErgoWatchDao,
 ) : ErgoWatchRepository {
-
+    private val storageMultiplier: Int = 10000
+    private val retrievalDivider: Double = 100.0
     override suspend fun fetchSummaryUTXOS(): Flow<Response<List<SummaryMetricsModel>>> =
         flow {
             emit(Response.Loading)
@@ -313,14 +320,14 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = metrics.map {
                 SummaryMetricsEntity(
                     label = it.label,
-                    current = it.current.toDouble().times(10000).toLong(),
+                    current = it.current.toDouble().times(storageMultiplier).toLong(),
                     isRelative = true,
                     isP2pks = true,
-                    diff1d = it.diff1d.toDouble().times(10000).toLong(),
-                    diff1w = it.diff1w.toDouble().times(10000).toLong(),
-                    diff4w = it.diff4w.toDouble().times(10000).toLong(),
-                    diff6m = it.diff6m.toDouble().times(10000).toLong(),
-                    diff1y = it.diff1y.toDouble().times(10000).toLong()
+                    diff1d = it.diff1d.toDouble().times(storageMultiplier).toLong(),
+                    diff1w = it.diff1w.toDouble().times(storageMultiplier).toLong(),
+                    diff4w = it.diff4w.toDouble().times(storageMultiplier).toLong(),
+                    diff6m = it.diff6m.toDouble().times(storageMultiplier).toLong(),
+                    diff1y = it.diff1y.toDouble().times(storageMultiplier).toLong()
                 )
             }
             ergoWatchDao.insertMetricsData(metrics = mappedList)
@@ -334,12 +341,12 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = result.map {
                 SummaryMetricsModel(
                     label = it.label,
-                    current = it.current,
-                    diff1d = it.diff1d,
-                    diff1w = it.diff1w,
-                    diff4w = it.diff4w,
-                    diff6m = it.diff6m,
-                    diff1y = it.diff1y
+                    current = it.current.div(retrievalDivider),
+                    diff1d = it.diff1d.div(retrievalDivider),
+                    diff1w = it.diff1w.div(retrievalDivider),
+                    diff4w = it.diff4w.div(retrievalDivider),
+                    diff6m = it.diff6m.div(retrievalDivider),
+                    diff1y = it.diff1y.div(retrievalDivider)
                 )
             }.toList()
             emit(Response.Success(mappedList))
@@ -352,14 +359,14 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = metrics.map {
                 SummaryMetricsEntity(
                     label = it.label,
-                    current = it.current.toDouble().times(10000).toLong(),
+                    current = it.current.toDouble().times(storageMultiplier).toLong(),
                     isRelative = true,
                     isContracts = true,
-                    diff1d = it.diff1d.toDouble().times(10000).toLong(),
-                    diff1w = it.diff1w.toDouble().times(10000).toLong(),
-                    diff4w = it.diff4w.toDouble().times(10000).toLong(),
-                    diff6m = it.diff6m.toDouble().times(10000).toLong(),
-                    diff1y = it.diff1y.toDouble().times(10000).toLong()
+                    diff1d = it.diff1d.toDouble().times(storageMultiplier).toLong(),
+                    diff1w = it.diff1w.toDouble().times(storageMultiplier).toLong(),
+                    diff4w = it.diff4w.toDouble().times(storageMultiplier).toLong(),
+                    diff6m = it.diff6m.toDouble().times(storageMultiplier).toLong(),
+                    diff1y = it.diff1y.toDouble().times(storageMultiplier).toLong()
                 )
             }
             ergoWatchDao.insertMetricsData(metrics = mappedList)
@@ -373,16 +380,220 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             val mappedList = result.map {
                 SummaryMetricsModel(
                     label = it.label,
-                    current = it.current,
-                    diff1d = it.diff1d,
-                    diff1w = it.diff1w,
-                    diff4w = it.diff4w,
-                    diff6m = it.diff6m,
-                    diff1y = it.diff1y
+                    current = it.current.div(retrievalDivider),
+                    diff1d = it.diff1d.div(retrievalDivider),
+                    diff1w = it.diff1w.div(retrievalDivider),
+                    diff4w = it.diff4w.div(retrievalDivider),
+                    diff6m = it.diff6m.div(retrievalDivider),
+                    diff1y = it.diff1y.div(retrievalDivider)
                 )
             }.toList()
             emit(Response.Success(mappedList))
         }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
+    override suspend fun fetchSummaryP2pkChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryAddressChartData(
+                addressType = "p2pk",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 
+    override suspend fun fetchSummaryContractsChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryAddressChartData(
+                addressType = "contracts",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryMinersChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchSummaryAddressChartData(
+                addressType = "miners",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryTransactionsChartData(): Flow<Response<UsageChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchUsageChartData(
+                usageType = "transactions",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryUTXOsChartData(): Flow<Response<UTXOChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchUsageUTXOChartData(
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchSummaryVolumeChartData(): Flow<Response<UsageChartDataModel>> =
+        flow {
+            val currentDate = LocalDateTime.now()
+            val dateOneMonthAgo = currentDate.minusMonths(1)
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchUsageChartData(
+                usageType = "volume",
+                startTime = dateOneMonthAgo.toEpochSecond(ZoneOffset.UTC) * 1000,
+                endTime = currentDate.toEpochSecond(ZoneOffset.UTC) * 1000,
+                timeWindowResolution = "24h",
+                priceData = false
+            )
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchStoredP2PKChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchDao.getMetricsChartData(isP2pk = true)
+            val timestampsList = mutableListOf<Long>()
+            val dataList = mutableListOf<Int>()
+            result.map {
+                timestampsList.add(0, it.date)
+                dataList.add(0, it.value)
+            }.toList()
+
+            emit(
+                Response.Success(
+                    AddressChartDataModel(
+                        timestamps = timestampsList,
+                        greaterThan1Erg = dataList,
+                    )
+                )
+            )
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun replaceStoredP2PKChartData(chartData: AddressChartDataModel) {
+        if (chartData.timestamps.isNotEmpty() && chartData.greaterThan1Erg.isNotEmpty()) {
+            ergoWatchDao.clearMetricsChartData(isP2pk = true)
+            val chartDataList = mutableListOf<MetricsChartDataEntity>()
+            chartData.timestamps.forEachIndexed { index, timestamp ->
+                chartDataList.add(
+                    0, MetricsChartDataEntity(
+                        date = timestamp,
+                        value = chartData.greaterThan1Erg[index],
+                        isP2pk = true
+                    )
+                )
+            }
+
+            ergoWatchDao.insertMetricsChartData(metrics = chartDataList)
+        }
+    }
+
+    override suspend fun fetchStoredContractsChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchDao.getMetricsChartData(isContract = true)
+            val timestampsList = mutableListOf<Long>()
+            val dataList = mutableListOf<Int>()
+            result.map {
+                timestampsList.add(0, it.date)
+                dataList.add(0, it.value)
+            }.toList()
+
+            emit(
+                Response.Success(
+                    AddressChartDataModel(
+                        timestamps = timestampsList,
+                        greaterThan1Erg = dataList,
+                    )
+                )
+            )
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun replaceStoredContractsChartData(chartData: AddressChartDataModel) {
+        if (chartData.timestamps.isNotEmpty() && chartData.greaterThan1Erg.isNotEmpty()) {
+            ergoWatchDao.clearMetricsChartData(isContract = true)
+            val chartDataList = mutableListOf<MetricsChartDataEntity>()
+            chartData.timestamps.forEachIndexed { index, timestamp ->
+                chartDataList.add(
+                    0, MetricsChartDataEntity(
+                        date = timestamp,
+                        value = chartData.greaterThan1Erg[index],
+                        isContract = true
+                    )
+                )
+            }
+
+            ergoWatchDao.insertMetricsChartData(metrics = chartDataList)
+        }
+    }
+
+    override suspend fun fetchStoredMiningChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchDao.getMetricsChartData(isMining = true)
+            val timestampsList = mutableListOf<Long>()
+            val dataList = mutableListOf<Int>()
+            result.map {
+                timestampsList.add(0, it.date)
+                dataList.add(0, it.value)
+            }.toList()
+
+            emit(
+                Response.Success(
+                    AddressChartDataModel(
+                        timestamps = timestampsList,
+                        greaterThan1Erg = dataList,
+                    )
+                )
+            )
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun replaceStoredMiningChartData(chartData: AddressChartDataModel) {
+        if (chartData.timestamps.isNotEmpty() && chartData.greaterThan1Erg.isNotEmpty()) {
+            ergoWatchDao.clearMetricsChartData(isMining = true)
+            val chartDataList = mutableListOf<MetricsChartDataEntity>()
+            chartData.timestamps.forEachIndexed { index, timestamp ->
+                chartDataList.add(
+                    0, MetricsChartDataEntity(
+                        date = timestamp,
+                        value = chartData.greaterThan1Erg[index],
+                        isMining = true
+                    )
+                )
+            }
+
+            ergoWatchDao.insertMetricsChartData(metrics = chartDataList)
+        }
+    }
 }

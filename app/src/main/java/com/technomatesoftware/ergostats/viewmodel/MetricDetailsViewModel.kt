@@ -8,6 +8,7 @@ import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
 import com.patrykandpatrick.vico.core.entry.ChartEntry
 import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
 import com.technomatesoftware.ergostats.config.NumberFormatter
+import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartAxisModel
 import com.technomatesoftware.ergostats.domain.models.CustomChartEntryModel
 import com.technomatesoftware.ergostats.domain.models.MetricsRetrievalModel
@@ -158,7 +159,7 @@ class MetricDetailsViewModel @Inject constructor(
 
     fun fetchChartData() {
         when (_metricTypeState.value) {
-            MetricsRetrievalModel.ADDRESS_P2PK -> fetchSummaryP2pkNetworkChartData()
+            MetricsRetrievalModel.ADDRESS_P2PK -> fetchSummaryStoredP2pkChartData()
             MetricsRetrievalModel.ADDRESS_CONTRACTS -> fetchSummaryContractsNetworkChartData()
             MetricsRetrievalModel.ADDRESS_MINING -> fetchSummaryMinersNetworkChartData()
             MetricsRetrievalModel.USAGE_TRANSACTIONS -> fetchSummaryTransactionsNetworkChartData()
@@ -166,6 +167,41 @@ class MetricDetailsViewModel @Inject constructor(
             MetricsRetrievalModel.USAGE_UTXO -> fetchSummaryUTXOsNetworkChartData()
             else -> {
                 setChartData(null)
+            }
+        }
+    }
+
+    private fun fetchSummaryStoredP2pkChartData() {
+        viewModelScope.launch {
+            ergoWatchRepository.fetchStoredP2PKChartData().collect { storedData ->
+                when (storedData) {
+                    is Response.Success -> {
+                        if (storedData.data?.timestamps?.isNotEmpty() == true && storedData.data.greaterThan1Erg.isNotEmpty()) {
+                            val dataWithTimestamps = mutableListOf<List<Double>>()
+                            val timestampsList = storedData.data.timestamps
+                            val dataList = storedData.data.greaterThan1Erg
+                            timestampsList.forEachIndexed { index, timestamp ->
+                                dataWithTimestamps.add(
+                                    0, mutableListOf(
+                                        timestamp.toDouble(),
+                                        dataList[index].toDouble()
+                                    )
+                                )
+                            }
+
+
+                            setChartData(
+                                CustomChartEntryModel(
+                                    chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
+                                    bottomAxisValueFormatter = buildChartBottomAxisValues(),
+                                )
+                            )
+                        }
+                        fetchSummaryP2pkNetworkChartData()
+                    }
+
+                    else -> {}
+                }
             }
         }
     }
@@ -196,6 +232,12 @@ class MetricDetailsViewModel @Inject constructor(
                                 CustomChartEntryModel(
                                     chartEntryModelProducer = produceChartEntryModel(dataSet = dataWithTimestamps),
                                     bottomAxisValueFormatter = buildChartBottomAxisValues(),
+                                )
+                            )
+                            ergoWatchRepository.replaceStoredP2PKChartData(
+                                AddressChartDataModel(
+                                    timestamps = timeStampsList,
+                                    greaterThan1Erg = dataList
                                 )
                             )
 

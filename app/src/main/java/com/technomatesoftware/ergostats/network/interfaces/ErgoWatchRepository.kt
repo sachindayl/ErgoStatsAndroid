@@ -39,4 +39,10 @@ interface ErgoWatchRepository {
     suspend fun fetchSummaryTransactionsChartData(): Flow<Response<UsageChartDataModel>>
     suspend fun fetchSummaryUTXOsChartData(): Flow<Response<UTXOChartDataModel>>
     suspend fun fetchSummaryVolumeChartData(): Flow<Response<UsageChartDataModel>>
+    suspend fun fetchStoredP2PKChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun replaceStoredP2PKChartData(chartData: AddressChartDataModel)
+    suspend fun fetchStoredContractsChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun replaceStoredContractsChartData(chartData: AddressChartDataModel)
+    suspend fun fetchStoredMiningChartData(): Flow<Response<AddressChartDataModel>>
+    suspend fun replaceStoredMiningChartData(chartData: AddressChartDataModel)
 }

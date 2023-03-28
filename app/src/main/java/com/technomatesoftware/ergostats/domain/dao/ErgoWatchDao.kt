@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.technomatesoftware.ergostats.domain.entities.MetricsChartDataEntity
 import com.technomatesoftware.ergostats.domain.entities.SummaryMetricsEntity
 
 @Dao
@@ -86,4 +87,43 @@ interface ErgoWatchDao {
         isP2pks: Boolean = true,
         isRelative: Boolean = true,
     ): List<SummaryMetricsEntity>
+
+    @Query(
+        "SELECT * FROM metrics_chart_data " +
+                "WHERE is_p2pk = :isP2pk " +
+                "AND is_contract = :isContract " +
+                "AND is_mining = :isMining " +
+                "AND is_volume = :isVolume " +
+                "AND is_transaction = :isTransaction " +
+                "AND is_utxo = :isUTXO"
+    )
+    suspend fun getMetricsChartData(
+        isP2pk: Boolean = false,
+        isContract: Boolean = false,
+        isMining: Boolean = false,
+        isVolume: Boolean = false,
+        isTransaction: Boolean = false,
+        isUTXO: Boolean = false,
+    ): List<MetricsChartDataEntity>
+
+    @Query(
+        "DELETE FROM metrics_chart_data " +
+                "WHERE is_p2pk = :isP2pk " +
+                "AND is_contract = :isContract " +
+                "AND is_mining = :isMining " +
+                "AND is_volume = :isVolume " +
+                "AND is_transaction = :isTransaction " +
+                "AND is_utxo = :isUTXO"
+    )
+    suspend fun clearMetricsChartData(
+        isP2pk: Boolean = false,
+        isContract: Boolean = false,
+        isMining: Boolean = false,
+        isVolume: Boolean = false,
+        isTransaction: Boolean = false,
+        isUTXO: Boolean = false,
+    )
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertMetricsChartData(metrics: List<MetricsChartDataEntity>)
 }

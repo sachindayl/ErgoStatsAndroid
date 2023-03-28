@@ -1,6 +1,7 @@
 package com.technomatesoftware.ergostats.network.repository
 
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
+import com.technomatesoftware.ergostats.domain.entities.MetricsChartDataEntity
 import com.technomatesoftware.ergostats.domain.entities.SummaryMetricsEntity
 import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
@@ -478,4 +479,121 @@ class ErgoWatchRepositoryImpl @Inject constructor(
             )
             emit(Response.Success(result))
         }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchStoredP2PKChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchDao.getMetricsChartData(isP2pk = true)
+            val timestampsList = mutableListOf<Long>()
+            val dataList = mutableListOf<Int>()
+            result.map {
+                timestampsList.add(0, it.date)
+                dataList.add(0, it.value)
+            }.toList()
+
+            emit(
+                Response.Success(
+                    AddressChartDataModel(
+                        timestamps = timestampsList,
+                        greaterThan1Erg = dataList,
+                    )
+                )
+            )
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun replaceStoredP2PKChartData(chartData: AddressChartDataModel) {
+        if (chartData.timestamps.isNotEmpty() && chartData.greaterThan1Erg.isNotEmpty()) {
+            ergoWatchDao.clearMetricsChartData(isP2pk = true)
+            val chartDataList = mutableListOf<MetricsChartDataEntity>()
+            chartData.timestamps.forEachIndexed { index, timestamp ->
+                chartDataList.add(
+                    0, MetricsChartDataEntity(
+                        date = timestamp,
+                        value = chartData.greaterThan1Erg[index],
+                        isP2pk = true
+                    )
+                )
+            }
+
+            ergoWatchDao.insertMetricsChartData(metrics = chartDataList)
+        }
+    }
+
+    override suspend fun fetchStoredContractsChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchDao.getMetricsChartData(isContract = true)
+            val timestampsList = mutableListOf<Long>()
+            val dataList = mutableListOf<Int>()
+            result.map {
+                timestampsList.add(0, it.date)
+                dataList.add(0, it.value)
+            }.toList()
+
+            emit(
+                Response.Success(
+                    AddressChartDataModel(
+                        timestamps = timestampsList,
+                        greaterThan1Erg = dataList,
+                    )
+                )
+            )
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun replaceStoredContractsChartData(chartData: AddressChartDataModel) {
+        if (chartData.timestamps.isNotEmpty() && chartData.greaterThan1Erg.isNotEmpty()) {
+            ergoWatchDao.clearMetricsChartData(isContract = true)
+            val chartDataList = mutableListOf<MetricsChartDataEntity>()
+            chartData.timestamps.forEachIndexed { index, timestamp ->
+                chartDataList.add(
+                    0, MetricsChartDataEntity(
+                        date = timestamp,
+                        value = chartData.greaterThan1Erg[index],
+                        isContract = true
+                    )
+                )
+            }
+
+            ergoWatchDao.insertMetricsChartData(metrics = chartDataList)
+        }
+    }
+
+    override suspend fun fetchStoredMiningChartData(): Flow<Response<AddressChartDataModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchDao.getMetricsChartData(isMining = true)
+            val timestampsList = mutableListOf<Long>()
+            val dataList = mutableListOf<Int>()
+            result.map {
+                timestampsList.add(0, it.date)
+                dataList.add(0, it.value)
+            }.toList()
+
+            emit(
+                Response.Success(
+                    AddressChartDataModel(
+                        timestamps = timestampsList,
+                        greaterThan1Erg = dataList,
+                    )
+                )
+            )
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun replaceStoredMiningChartData(chartData: AddressChartDataModel) {
+        if (chartData.timestamps.isNotEmpty() && chartData.greaterThan1Erg.isNotEmpty()) {
+            ergoWatchDao.clearMetricsChartData(isMining = true)
+            val chartDataList = mutableListOf<MetricsChartDataEntity>()
+            chartData.timestamps.forEachIndexed { index, timestamp ->
+                chartDataList.add(
+                    0, MetricsChartDataEntity(
+                        date = timestamp,
+                        value = chartData.greaterThan1Erg[index],
+                        isMining = true
+                    )
+                )
+            }
+
+            ergoWatchDao.insertMetricsChartData(metrics = chartDataList)
+        }
+    }
 }

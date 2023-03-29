@@ -37,11 +37,13 @@ class AgeUSDViewModel @Inject constructor(
                 is Response.Success -> {
 
                     if (response.data != null) {
+                        val ageUsdInfo = response.data
                         _viewState.value = _viewState.value.copy(
-                            sigmaReserveValue = "${response.data.getFormattedSigmaReserve()} ERG/SigRSV",
-                            sigmaReservePerErgValue = response.data.getFormattedSigmaReservePerErg(),
-                            sigmaUSDValue = "${response.data.getFormattedSigmaUSD()} ERG/SigUSD",
-                            sigmaUSDPerErgValue = response.data.getFormattedSigmaUSDPerErg()
+                            reserveRatio = "${ageUsdInfo.getFormattedReserveRatio()}%",
+                            sigmaReserveValue = "${ageUsdInfo.getFormattedSigmaReserve()} ERG/SigRSV",
+                            sigmaReservePerErgValue = ageUsdInfo.getFormattedSigmaReservePerErg(),
+                            sigmaUSDValue = "${ageUsdInfo.getFormattedSigmaUSD()} ERG/SigUSD",
+                            sigmaUSDPerErgValue = ageUsdInfo.getFormattedSigmaUSDPerErg()
                         )
                     }
 

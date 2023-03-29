@@ -48,6 +48,26 @@ fun AgeUsdView(
         mainViewModel.setEnableBackButton(false)
     }
 
+    AgeUsdBody(
+        padding = padding,
+        reserveRatio = currentState.value.reserveRatio,
+        sigmaUSDToErg = currentState.value.sigmaUSDPerErgValue,
+        sigmaUSD = currentState.value.sigmaUSDValue,
+        sigmaReserveToErg = currentState.value.sigmaReservePerErgValue,
+        sigmaReserve = currentState.value.sigmaReserveValue
+    )
+
+}
+
+@Composable
+fun AgeUsdBody(
+    padding: PaddingValues,
+    reserveRatio: String,
+    sigmaUSD: String,
+    sigmaUSDToErg: String,
+    sigmaReserve: String,
+    sigmaReserveToErg: String
+) {
     Column(
         modifier = Modifier
             .padding(padding)
@@ -56,17 +76,29 @@ fun AgeUsdView(
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+        Text(
+            "Ratio",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(top = 32.dp)
+        )
+        Text(
+            reserveRatio,
+            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.SemiBold),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+
         AgeUsdCard(
             padding = PaddingValues(16.dp),
             label = "SigUSD",
-            value1 = currentState.value.sigmaUSDPerErgValue,
-            value2 = currentState.value.sigmaUSDValue
+            value1 = sigmaUSDToErg,
+            value2 = sigmaUSD
         )
         AgeUsdCard(
             padding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp),
             label = "SigRSV",
-            value1 = currentState.value.sigmaReservePerErgValue,
-            value2 = currentState.value.sigmaReserveValue
+            value1 = sigmaReserveToErg,
+            value2 = sigmaReserve
         )
         LazyVerticalGrid(
             GridCells.Fixed(3),
@@ -144,7 +176,7 @@ fun AgeUsdView(
 
             item {
                 AgeUsdTableItem(
-                    label = "Purchase",
+                    label = "Redeem",
                     isCorrect = true,
                     padding = PaddingValues(top = 8.dp)
                 )
@@ -252,7 +284,6 @@ fun AgeUsdView(
         }
 
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -260,6 +291,13 @@ fun AgeUsdView(
 @Composable
 fun AgeUsdViewPreview() {
     Scaffold { padding ->
-        AgeUsdView(padding = padding)
+        AgeUsdBody(
+            padding = padding,
+            reserveRatio = "380%",
+            sigmaUSDToErg = "1.60",
+            sigmaUSD = "0.643232 ERG/SigUSD",
+            sigmaReserve = "0.02321412 ERG/SigRSV",
+            sigmaReserveToErg = "2,177"
+        )
     }
 }

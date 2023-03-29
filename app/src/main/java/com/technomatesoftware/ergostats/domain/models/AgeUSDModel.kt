@@ -35,4 +35,9 @@ data class AgeUSDModel(
         val valueToErg = 1.div(realValue)
         return decimalFormat.format(valueToErg)
     }
+
+    fun getFormattedReserveRatio(): String {
+        val decimalFormat = DecimalFormat("#,###")
+        return decimalFormat.format(reserveRatio)
+    }
 }

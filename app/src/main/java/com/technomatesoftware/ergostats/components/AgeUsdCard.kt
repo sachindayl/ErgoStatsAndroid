@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AgeUsdCard(padding: PaddingValues) {
+fun AgeUsdCard(padding: PaddingValues, label: String, value1: String, value2: String) {
     Card(
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
@@ -40,20 +40,20 @@ fun AgeUsdCard(padding: PaddingValues) {
                 .padding(8.dp)
         ) {
             Text(
-                "SigUSD",
+                label,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(8.dp)
             )
             Text(
-                "1 ERG = 343423",
+                "1 ERG = $value1",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(
                     bottom = 4.dp
                 )
             )
-            Text("25,000", fontSize = 12.sp)
+            Text(value2, fontSize = 12.sp)
         }
     }
 
@@ -62,7 +62,12 @@ fun AgeUsdCard(padding: PaddingValues) {
 @Preview(showBackground = true)
 @Composable
 fun AgeUsdCardPreview() {
-    AgeUsdCard(PaddingValues(8.dp))
+    AgeUsdCard(
+        PaddingValues(8.dp),
+        label = "SigUSD",
+        value1 = 2.4534.toString(),
+        value2 = "2322112"
+    )
 }
 
 

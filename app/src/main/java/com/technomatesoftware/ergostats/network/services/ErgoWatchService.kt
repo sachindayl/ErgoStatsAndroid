@@ -1,6 +1,7 @@
 package com.technomatesoftware.ergostats.network.services
 
 import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
+import com.technomatesoftware.ergostats.domain.models.RichModel
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
 import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
@@ -59,4 +60,7 @@ interface ErgoWatchService {
         @Query("r") timeWindowResolution: String,
         @Query("ergusd") priceData: Boolean,
     ): UTXOChartDataModel
+
+    @GET("lists/addresses/by/balance?limit=100")
+    suspend fun fetchTop100RichList(): List<RichModel>
 }

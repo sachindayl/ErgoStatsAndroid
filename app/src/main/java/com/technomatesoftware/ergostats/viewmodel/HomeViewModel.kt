@@ -43,77 +43,75 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun coinMarketData() {
-        viewModelScope.launch {
-            coinGeckoRepository.getStoredCoinMarketData().collect { storedData ->
+    private suspend fun coinMarketData() {
+        coinGeckoRepository.getStoredCoinMarketData().collect { storedData ->
 
-                when (storedData) {
-                    is Response.Success -> {
-                        if (storedData.data?.isNotEmpty() == true) {
-                            _coinGeckoState.value = storedData
-                        }
-                        coinGeckoRepository.getCoinMarketData().collect { response ->
-                            when (response) {
-                                is Response.Success -> {
-                                    _coinGeckoState.value = response
-                                    coinGeckoRepository.replaceCoinMarketData(
-                                        response.data ?: emptyList()
-                                    )
-                                }
-
-                                else -> {}
+            when (storedData) {
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
+                        _coinGeckoState.value = storedData
+                    }
+                    coinGeckoRepository.getCoinMarketData().collect { response ->
+                        when (response) {
+                            is Response.Success -> {
+                                _coinGeckoState.value = response
+                                coinGeckoRepository.replaceCoinMarketData(
+                                    response.data ?: emptyList()
+                                )
                             }
+
+                            else -> {}
                         }
                     }
-
-                    else -> {}
                 }
+
+                else -> {}
             }
         }
+
     }
 
-    private fun getCoinMarketChartData() {
-        viewModelScope.launch {
+    private suspend fun getCoinMarketChartData() {
 
-            coinGeckoRepository.getStoredMarketChartData().collect { storedData ->
-                when (storedData) {
-                    is Response.Success -> {
-                        if (storedData.data?.isNotEmpty() == true) {
-                            val filteredList = filterChartDataSet(storedData.data)
-                            _coinGeckoChartEntryState.value =
-                                CustomChartEntryModel(
-                                    produceChartEntryModel(filteredList),
-                                    buildChartBottomAxisValues()
-                                )
-                        }
-                        coinGeckoRepository.getCoinMarketPriceChartData().collect { response ->
+        coinGeckoRepository.getStoredMarketChartData().collect { storedData ->
+            when (storedData) {
+                is Response.Success -> {
+                    if (storedData.data?.isNotEmpty() == true) {
+                        val filteredList = filterChartDataSet(storedData.data)
+                        _coinGeckoChartEntryState.value =
+                            CustomChartEntryModel(
+                                produceChartEntryModel(filteredList),
+                                buildChartBottomAxisValues()
+                            )
+                    }
+                    coinGeckoRepository.getCoinMarketPriceChartData().collect { response ->
 
-                            when (response) {
-                                is Response.Success -> {
-                                    val filteredList =
-                                        filterChartDataSet(response.data ?: emptyList())
+                        when (response) {
+                            is Response.Success -> {
+                                val filteredList =
+                                    filterChartDataSet(response.data ?: emptyList())
 
-                                    _coinGeckoChartEntryState.value =
-                                        CustomChartEntryModel(
-                                            produceChartEntryModel(filteredList),
-                                            buildChartBottomAxisValues()
-                                        )
-
-                                    coinGeckoRepository.replaceMarketChartData(
-                                        response.data ?: emptyList()
+                                _coinGeckoChartEntryState.value =
+                                    CustomChartEntryModel(
+                                        produceChartEntryModel(filteredList),
+                                        buildChartBottomAxisValues()
                                     )
-                                }
 
-                                else -> {}
+                                coinGeckoRepository.replaceMarketChartData(
+                                    response.data ?: emptyList()
+                                )
                             }
-                        }
 
+                            else -> {}
+                        }
                     }
 
-                    else -> {}
                 }
+
+                else -> {}
             }
         }
+
     }
 
     private fun filterChartDataSet(

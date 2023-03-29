@@ -11,9 +11,11 @@ import com.technomatesoftware.ergostats.domain.database.MIGRATION_3_4
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
+import com.technomatesoftware.ergostats.network.interfaces.TokenJayRepository
 import com.technomatesoftware.ergostats.network.repository.CoinGeckoRepositoryImpl
 import com.technomatesoftware.ergostats.network.repository.ErgoPlatformRepositoryImpl
 import com.technomatesoftware.ergostats.network.repository.ErgoWatchRepositoryImpl
+import com.technomatesoftware.ergostats.network.repository.TokenJayRepositoryImpl
 import com.technomatesoftware.ergostats.network.services.CoinGeckoService
 import com.technomatesoftware.ergostats.network.services.ErgoPlatformService
 import com.technomatesoftware.ergostats.network.services.ErgoWatchService
@@ -177,5 +179,10 @@ class AppModule {
         ergoPlatformDao
     )
 
-
+    @Provides
+    fun provideTokenJayRepository(
+        tokenJayService: TokenJayService
+    ): TokenJayRepository = TokenJayRepositoryImpl(
+        tokenJayService
+    )
 }

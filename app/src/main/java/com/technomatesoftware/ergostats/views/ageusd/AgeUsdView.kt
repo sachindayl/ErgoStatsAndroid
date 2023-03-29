@@ -15,6 +15,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,8 +25,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.technomatesoftware.ergostats.components.AgeUsdCard
 import com.technomatesoftware.ergostats.components.AgeUsdTableItem
+import com.technomatesoftware.ergostats.domain.states.AgeUSDViewState
+import com.technomatesoftware.ergostats.viewmodel.AgeUSDViewModel
 import com.technomatesoftware.ergostats.viewmodel.MainViewModel
 import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 
@@ -32,7 +37,10 @@ import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 fun AgeUsdView(
     padding: PaddingValues,
     mainViewModel: MainViewModel = remember { MainViewModelSingleton.viewModel },
+    ageUSDViewModel: AgeUSDViewModel = hiltViewModel()
 ) {
+    val currentState: State<AgeUSDViewState> =
+        ageUSDViewModel.viewState.collectAsState()
 
     LaunchedEffect(Unit) {
         mainViewModel.setTitle("Age USD")
@@ -48,8 +56,18 @@ fun AgeUsdView(
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        AgeUsdCard(padding = PaddingValues(16.dp))
-        AgeUsdCard(padding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp))
+        AgeUsdCard(
+            padding = PaddingValues(16.dp),
+            label = "SigUSD",
+            value1 = currentState.value.sigmaUSDPerErgValue,
+            value2 = currentState.value.sigmaUSDValue
+        )
+        AgeUsdCard(
+            padding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp),
+            label = "SigRSV",
+            value1 = currentState.value.sigmaReservePerErgValue,
+            value2 = currentState.value.sigmaReserveValue
+        )
         LazyVerticalGrid(
             GridCells.Fixed(3),
             horizontalArrangement = Arrangement.SpaceBetween,

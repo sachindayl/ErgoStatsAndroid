@@ -2,6 +2,7 @@ package com.technomatesoftware.ergostats.network.interfaces
 
 import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
 import com.technomatesoftware.ergostats.domain.models.Response
+import com.technomatesoftware.ergostats.domain.models.RichModel
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
 import com.technomatesoftware.ergostats.domain.models.SupplyDistributionModel
 import com.technomatesoftware.ergostats.domain.models.UTXOChartDataModel
@@ -45,4 +46,5 @@ interface ErgoWatchRepository {
     suspend fun replaceStoredContractsChartData(chartData: AddressChartDataModel)
     suspend fun fetchStoredMiningChartData(): Flow<Response<AddressChartDataModel>>
     suspend fun replaceStoredMiningChartData(chartData: AddressChartDataModel)
+    suspend fun getTop100RichList(): Flow<Response<List<RichModel>>>
 }

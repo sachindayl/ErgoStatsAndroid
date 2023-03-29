@@ -48,13 +48,22 @@ fun NavGraph(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text(text = currentState.value.appBarTitle, color = MaterialTheme.colorScheme.onPrimary) },
+                title = {
+                    Text(
+                        text = currentState.value.appBarTitle,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                },
                 navigationIcon = {
                     if (currentState.value.enableBackButton) {
                         IconButton(onClick = {
                             navController.navigateUp()
                         }) {
-                            Icon(Icons.Rounded.ArrowBack, "back arrow", tint = MaterialTheme.colorScheme.onPrimary)
+                            Icon(
+                                Icons.Rounded.ArrowBack,
+                                "back arrow",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
                         }
                     }
                 },
@@ -93,7 +102,10 @@ fun NavGraph(
             composable(Routes.AGE_USD.value) {
                 AgeUsdView(padding = padding)
             }
-            composable("${Routes.METRICS_DETAILS.value}/{metricsRetrievalId}", arguments = listOf(navArgument("metricsRetrievalId") { type = NavType.IntType })) { backStackEntry ->
+            composable(
+                "${Routes.METRICS_DETAILS.value}/{metricsRetrievalId}",
+                arguments = listOf(navArgument("metricsRetrievalId") { type = NavType.IntType })
+            ) { backStackEntry ->
                 val metricId = backStackEntry.arguments?.getInt("metricsRetrievalId") ?: 0
                 MetricsDetailsView(
                     padding = padding,

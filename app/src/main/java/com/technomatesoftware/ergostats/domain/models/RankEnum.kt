@@ -1,6 +1,6 @@
 package com.technomatesoftware.ergostats.domain.models
 
-enum class RankModel(val value: String) {
+enum class RankEnum(val value: String) {
     RECRUIT("recruit"),
     CAPTAIN("captain"),
     COLONEL("colonel"),

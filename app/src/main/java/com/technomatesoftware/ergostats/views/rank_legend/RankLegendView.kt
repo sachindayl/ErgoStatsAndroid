@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.technomatesoftware.ergostats.R
 import com.technomatesoftware.ergostats.domain.models.RankLegendModel
-import com.technomatesoftware.ergostats.domain.models.RankModel
+import com.technomatesoftware.ergostats.domain.models.RankEnum
 import com.technomatesoftware.ergostats.domain.states.RankLegendViewState
 import com.technomatesoftware.ergostats.viewmodel.MainViewModel
 import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
@@ -71,7 +71,7 @@ fun RankLegendBody(paddingValues: PaddingValues, legendList: List<RankLegendMode
                             .height(30.dp)
                             .width(30.dp)
                     ) {
-                        if (item.rankType != RankModel.RECRUIT) {
+                        if (item.rankType != RankEnum.RECRUIT) {
                             Image(
                                 painter = painterResource(id = getRankImage(item.rankType)),
                                 contentDescription = item.label
@@ -93,19 +93,19 @@ fun RankLegendBody(paddingValues: PaddingValues, legendList: List<RankLegendMode
 
 }
 
-private fun getRankImage(rank: RankModel): Int {
+private fun getRankImage(rank: RankEnum): Int {
     return when (rank) {
-        RankModel.RECRUIT -> R.drawable.first_lieutenant
-        RankModel.CAPTAIN -> R.drawable.captain
-        RankModel.COLONEL -> R.drawable.colonel
-        RankModel.FIRST_LIEUTENANT -> R.drawable.first_lieutenant
-        RankModel.SECOND_LIEUTENANT -> R.drawable.second_lieutenant
-        RankModel.MAJOR -> R.drawable.major
-        RankModel.MAJOR_GENERAL -> R.drawable.major_general
-        RankModel.LIEUTENANT_COLONEL -> R.drawable.lieutenant_colonel
-        RankModel.LIEUTENANT_GENERAL -> R.drawable.lieutenant_general
-        RankModel.BRIGADIER_GENERAL -> R.drawable.brigadier_general
-        RankModel.GENERAL -> R.drawable.general
+        RankEnum.RECRUIT -> R.drawable.first_lieutenant
+        RankEnum.CAPTAIN -> R.drawable.captain
+        RankEnum.COLONEL -> R.drawable.colonel
+        RankEnum.FIRST_LIEUTENANT -> R.drawable.first_lieutenant
+        RankEnum.SECOND_LIEUTENANT -> R.drawable.second_lieutenant
+        RankEnum.MAJOR -> R.drawable.major
+        RankEnum.MAJOR_GENERAL -> R.drawable.major_general
+        RankEnum.LIEUTENANT_COLONEL -> R.drawable.lieutenant_colonel
+        RankEnum.LIEUTENANT_GENERAL -> R.drawable.lieutenant_general
+        RankEnum.BRIGADIER_GENERAL -> R.drawable.brigadier_general
+        RankEnum.GENERAL -> R.drawable.general
     }
 }
 
@@ -114,8 +114,8 @@ private fun getRankImage(rank: RankModel): Int {
 @Composable
 fun RankLegendBodyPreview() {
     val legendList = listOf(
-        RankLegendModel(RankModel.LIEUTENANT_GENERAL, "Lieutenant", "100,000 ERG"),
-        RankLegendModel(RankModel.GENERAL, "General", "150,000 ERG")
+        RankLegendModel(RankEnum.LIEUTENANT_GENERAL, "Lieutenant", "100,000 ERG"),
+        RankLegendModel(RankEnum.GENERAL, "General", "150,000 ERG")
     )
 
     Scaffold { padding ->

@@ -7,4 +7,5 @@ enum class Routes(val value: String) {
     RICH_LIST("rich list"),
     AGE_USD("age usd"),
     METRICS_DETAILS("metrics details"),
+    RANK_LEGEND("rank legend"),
 }

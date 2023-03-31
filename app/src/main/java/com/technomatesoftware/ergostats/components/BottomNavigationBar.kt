@@ -1,23 +1,18 @@
 package com.technomatesoftware.ergostats.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.technomatesoftware.ergostats.R
 import com.technomatesoftware.ergostats.domain.models.Routes
 
 @Composable
@@ -27,17 +22,17 @@ fun BottomNavigationBar(
     val items = listOf(
         Routes.HOME,
         Routes.METRICS,
-        Routes.RICH_LIST,
         Routes.RANK,
+        Routes.RICH_LIST,
         Routes.AGE_USD
     )
 
     val icons = listOf(
-        Icons.Default.Menu,
-        Icons.Default.DateRange,
-        Icons.Default.Search,
-        Icons.Default.Favorite,
-        Icons.Default.AccountBox
+        R.drawable.home,
+        R.drawable.chart,
+        R.drawable.rank,
+        R.drawable.list,
+        R.drawable.money
     )
 
     NavigationBar {
@@ -45,8 +40,13 @@ fun BottomNavigationBar(
         val currentRoute = navBackStackEntry?.destination?.route
         items.forEachIndexed { index, item ->
             NavigationBarItem(
-                icon = { Icon(icons[index], contentDescription = item.name) },
-                label = { Text(item.value.toUpperCase(Locale.current)) },
+                icon = { Icon(painterResource(id = icons[index]), contentDescription = item.name) },
+                label = {
+                    Text(
+                        item.value,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                },
                 selected = currentRoute == item.value,
                 onClick = {
                     navController.navigate(item.value) {

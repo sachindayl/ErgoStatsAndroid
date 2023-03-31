@@ -34,7 +34,7 @@ class MetricDetailsViewModel @Inject constructor(
     val viewState: StateFlow<MetricDetailsViewState> = _viewState
     private val _metricTypeState =
         mutableStateOf(MetricsRetrievalModel.ADDRESS_P2PK)
-    private val dateFilterModulus = 6
+    private val dateFilterModulus = 7
 //    val metricTypeState: State<MetricsRetrievalModel> = _metricTypeState
 
 

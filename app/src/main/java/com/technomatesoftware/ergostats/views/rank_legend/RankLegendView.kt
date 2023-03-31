@@ -106,6 +106,7 @@ private fun getRankImage(rank: RankEnum): Int {
         RankEnum.LIEUTENANT_GENERAL -> R.drawable.lieutenant_general
         RankEnum.BRIGADIER_GENERAL -> R.drawable.brigadier_general
         RankEnum.GENERAL -> R.drawable.general
+        else -> 0
     }
 }
 

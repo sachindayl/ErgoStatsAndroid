@@ -4,6 +4,7 @@ import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
 import com.technomatesoftware.ergostats.domain.entities.MetricsChartDataEntity
 import com.technomatesoftware.ergostats.domain.entities.SummaryMetricsEntity
 import com.technomatesoftware.ergostats.domain.models.AddressChartDataModel
+import com.technomatesoftware.ergostats.domain.models.RankPositionModel
 import com.technomatesoftware.ergostats.domain.models.Response
 import com.technomatesoftware.ergostats.domain.models.RichModel
 import com.technomatesoftware.ergostats.domain.models.SummaryMetricsModel
@@ -601,7 +602,14 @@ class ErgoWatchRepositoryImpl @Inject constructor(
     override suspend fun getTop100RichList(): Flow<Response<List<RichModel>>> =
         flow {
             emit(Response.Loading)
-            val result = ergoWatchService.fetchTop100RichList()
+            val result = ergoWatchService.fetchTop100RichList(limit = 100)
+            emit(Response.Success(result))
+        }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
+
+    override suspend fun fetchAddressRank(address: String): Flow<Response<RankPositionModel>> =
+        flow {
+            emit(Response.Loading)
+            val result = ergoWatchService.fetchAddressRanking(address)
             emit(Response.Success(result))
         }.flowOn(Dispatchers.IO).catch { err -> emit(Response.Failure(Exception(err))) }
 }

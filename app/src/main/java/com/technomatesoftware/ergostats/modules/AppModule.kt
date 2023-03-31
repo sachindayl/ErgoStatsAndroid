@@ -7,6 +7,8 @@ import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoPlatformDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
 import com.technomatesoftware.ergostats.domain.database.ErgoStatsDB
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_1_2
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_2_3
 import com.technomatesoftware.ergostats.domain.database.MIGRATION_3_4
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
@@ -50,6 +52,8 @@ class AppModule {
             appContext,
             ErgoStatsDB::class.java, "ergo-stats"
         )
+            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
             .build()
     }

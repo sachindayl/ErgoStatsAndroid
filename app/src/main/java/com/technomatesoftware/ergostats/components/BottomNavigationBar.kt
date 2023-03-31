@@ -1,14 +1,13 @@
 package com.technomatesoftware.ergostats.components
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -42,7 +41,12 @@ fun BottomNavigationBar(
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 icon = { Icon(painterResource(id = icons[index]), contentDescription = item.name) },
-                label = { Text(item.value.toUpperCase(Locale.current)) },
+                label = {
+                    Text(
+                        item.value,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                },
                 selected = currentRoute == item.value,
                 onClick = {
                     navController.navigate(item.value) {

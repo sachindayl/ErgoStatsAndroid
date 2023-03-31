@@ -206,7 +206,7 @@ fun RankViewBody(
             enabled = errorMessage == null && address.isNotEmpty(),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp)
+                .padding(horizontal = 32.dp, vertical = 8.dp)
         ) {
             Text(
                 "Submit",

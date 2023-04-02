@@ -43,6 +43,10 @@ Main features are:
 
 [Terms and Conditions](https://sites.google.com/view/ergo-stats/terms-conditions)
 
+### Special Thanks
+
+Special Thanks to [Alin Chitas](https://github.com/ach2swift) for his support and guidance.
+
 ## Tip jar
 
 If you enjoy the app and you wish to support my work, you can do so at:

@@ -25,7 +25,39 @@ class AgeUSDViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
+            fetchStoredAgeUsdData()
             ageUSDInfo()
+        }
+    }
+
+    private suspend fun fetchStoredAgeUsdData() {
+        _viewState.value = _viewState.value.copy(isLoading = true)
+        tokenJayRepository.fetchStoredAgeUSDInfo().collect { storedData ->
+            when (storedData) {
+                is Response.Success -> {
+                    if (storedData.data != null) {
+                        _viewState.value = _viewState.value.copy(
+                            reserveRatio = "${storedData.data.getFormattedReserveRatio()}%",
+                            sigmaReserveValue = "${storedData.data.getFormattedSigmaReserve()} ERG/SigRSV",
+                            sigmaReservePerErgValue = storedData.data.getFormattedSigmaReservePerErg(),
+                            sigmaUSDValue = "${storedData.data.getFormattedSigmaUSD()} ERG/SigUSD",
+                            sigmaUSDPerErgValue = storedData.data.getFormattedSigmaUSDPerErg(),
+                            isLoading = false
+                        )
+                    }
+
+                }
+
+                is Response.Failure -> {
+                    Log.d("ageUSDInfo", storedData.e.toString())
+                    _viewState.value = _viewState.value.copy(
+                        isLoading = false,
+                        errorMessage = "Unexpected error occurred"
+                    )
+                }
+
+                else -> {}
+            }
         }
     }
 
@@ -43,8 +75,11 @@ class AgeUSDViewModel @Inject constructor(
                             sigmaReserveValue = "${ageUsdInfo.getFormattedSigmaReserve()} ERG/SigRSV",
                             sigmaReservePerErgValue = ageUsdInfo.getFormattedSigmaReservePerErg(),
                             sigmaUSDValue = "${ageUsdInfo.getFormattedSigmaUSD()} ERG/SigUSD",
-                            sigmaUSDPerErgValue = ageUsdInfo.getFormattedSigmaUSDPerErg()
+                            sigmaUSDPerErgValue = ageUsdInfo.getFormattedSigmaUSDPerErg(),
+                            isLoading = false,
+                            errorMessage = null,
                         )
+                        tokenJayRepository.replaceAgeUSDInfo(ageUsdInfo)
                     }
 
                 }

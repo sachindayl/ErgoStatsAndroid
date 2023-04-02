@@ -3,12 +3,14 @@ package com.technomatesoftware.ergostats.views.ageusd
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -54,7 +56,9 @@ fun AgeUsdView(
         sigmaUSDToErg = currentState.value.sigmaUSDPerErgValue,
         sigmaUSD = currentState.value.sigmaUSDValue,
         sigmaReserveToErg = currentState.value.sigmaReservePerErgValue,
-        sigmaReserve = currentState.value.sigmaReserveValue
+        sigmaReserve = currentState.value.sigmaReserveValue,
+        errorMessage = currentState.value.errorMessage,
+        isLoading = currentState.value.isLoading
     )
 
 }
@@ -66,223 +70,240 @@ fun AgeUsdBody(
     sigmaUSD: String,
     sigmaUSDToErg: String,
     sigmaReserve: String,
-    sigmaReserveToErg: String
+    sigmaReserveToErg: String,
+    isLoading: Boolean,
+    errorMessage: String?
 ) {
     Column(
         modifier = Modifier
+            .fillMaxSize()
             .padding(padding)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Text(
-            "Ratio",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(top = 32.dp)
-        )
-        Text(
-            reserveRatio,
-            style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.SemiBold),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+        if (isLoading) {
+            CircularProgressIndicator()
+        } else if (errorMessage != null) {
+            Text(
+                errorMessage,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 32.dp)
+            )
+        } else {
+            Text(
+                "Ratio",
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(top = 32.dp)
+            )
+            Text(
+                reserveRatio,
+                style = MaterialTheme.typography.headlineLarge.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
 
 
-        AgeUsdCard(
-            padding = PaddingValues(16.dp),
-            label = "SigUSD",
-            value1 = sigmaUSDToErg,
-            value2 = sigmaUSD
-        )
-        AgeUsdCard(
-            padding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp),
-            label = "SigRSV",
-            value1 = sigmaReserveToErg,
-            value2 = sigmaReserve
-        )
-        LazyVerticalGrid(
-            GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalArrangement = Arrangement.SpaceEvenly,
-            contentPadding = PaddingValues(horizontal = 8.dp),
-            modifier = Modifier
-                .height(350.dp)
-                .padding(16.dp)
+            AgeUsdCard(
+                padding = PaddingValues(16.dp),
+                label = "SigUSD",
+                value1 = sigmaUSDToErg,
+                value2 = sigmaUSD
+            )
+            AgeUsdCard(
+                padding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                label = "SigRSV",
+                value1 = sigmaReserveToErg,
+                value2 = sigmaReserve
+            )
+            AgeUsdExplanationGrid()
+        }
+    }
+}
 
-        ) {
-            item {
-                Text(
-                    text = "SigUSD",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            item {
-                Text(
-                    text = "Reserve Ratio",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            item {
-                Text(
-                    text = "SigRSV",
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            item {
-                AgeUsdTableItem(
-                    label = "Purchase",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-            item {
-                Text(
-                    "Above",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-            item {
-                AgeUsdTableItem(
-                    label = "Purchase",
-                    isCorrect = false,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
+@Composable
+fun AgeUsdExplanationGrid() {
+    LazyVerticalGrid(
+        GridCells.Fixed(3),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.SpaceEvenly,
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        modifier = Modifier
+            .height(350.dp)
+            .padding(16.dp)
 
-            item {
-                AgeUsdTableItem(
-                    label = "Redeem",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                Text(
-                    "800%",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Redeem",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Purchase",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                Text(
-                    "800% >",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Purchase",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Redeem",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                Text(
-                    "< 400%",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Redeem",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Purchase",
-                    isCorrect = false,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                Text(
-                    "Below",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Purchase",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Redeem",
-                    isCorrect = true,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
-
-            item {
-                Text(
-                    "400%",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            item {
-                AgeUsdTableItem(
-                    label = "Redeem",
-                    isCorrect = false,
-                    padding = PaddingValues(top = 8.dp)
-                )
-            }
+    ) {
+        item {
+            Text(
+                text = "SigUSD",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        item {
+            Text(
+                text = "Reserve Ratio",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        item {
+            Text(
+                text = "SigRSV",
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+        item {
+            AgeUsdTableItem(
+                label = "Purchase",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+        item {
+            Text(
+                "Above",
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+        item {
+            AgeUsdTableItem(
+                label = "Purchase",
+                isCorrect = false,
+                padding = PaddingValues(top = 8.dp)
+            )
         }
 
+        item {
+            AgeUsdTableItem(
+                label = "Redeem",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            Text(
+                "800%",
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Redeem",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Purchase",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            Text(
+                "800% >",
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Purchase",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Redeem",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            Text(
+                "< 400%",
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Redeem",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Purchase",
+                isCorrect = false,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            Text(
+                "Below",
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Purchase",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Redeem",
+                isCorrect = true,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
+
+        item {
+            Text(
+                "400%",
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
+        item {
+            AgeUsdTableItem(
+                label = "Redeem",
+                isCorrect = false,
+                padding = PaddingValues(top = 8.dp)
+            )
+        }
     }
 }
 
@@ -297,7 +318,9 @@ fun AgeUsdViewPreview() {
             sigmaUSDToErg = "1.60",
             sigmaUSD = "0.643232 ERG/SigUSD",
             sigmaReserve = "0.02321412 ERG/SigRSV",
-            sigmaReserveToErg = "2,177"
+            sigmaReserveToErg = "2,177",
+            errorMessage = null,
+            isLoading = false
         )
     }
 }

@@ -3,14 +3,15 @@ package com.technomatesoftware.ergostats.navigation
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -18,8 +19,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -38,6 +39,7 @@ import com.technomatesoftware.ergostats.views.metrics_details.MetricsDetailsView
 import com.technomatesoftware.ergostats.views.rank.RankView
 import com.technomatesoftware.ergostats.views.rank_legend.RankLegendView
 import com.technomatesoftware.ergostats.views.richlist.RichListView
+import com.technomatesoftware.ergostats.views.settings.SettingsView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,11 +54,12 @@ fun NavGraph(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            LargeTopAppBar(
                 title = {
                     Text(
                         text = currentState.value.appBarTitle,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
@@ -67,7 +70,7 @@ fun NavGraph(
                             Icon(
                                 Icons.Rounded.ArrowBack,
                                 "back arrow",
-                                tint = MaterialTheme.colorScheme.onPrimary
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                     }
@@ -81,7 +84,17 @@ fun NavGraph(
                                 Icon(
                                     Icons.Default.Info,
                                     contentDescription = "Share",
-                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+
+                        Routes.HOME.value -> {
+                            IconButton(onClick = {
+                                navController.navigate(Routes.SETTINGS.value)
+                            }) {
+                                Icon(
+                                    Icons.Default.Settings,
+                                    contentDescription = "Settings",
                                 )
                             }
                         }
@@ -91,9 +104,9 @@ fun NavGraph(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    actionIconContentColor = MaterialTheme.colorScheme.onBackground
                 ),
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.fillMaxWidth()
@@ -139,6 +152,10 @@ fun NavGraph(
 
             composable(Routes.RANK_LEGEND.value) {
                 RankLegendView(padding = padding)
+            }
+
+            composable(Routes.SETTINGS.value) {
+                SettingsView(padding = padding)
             }
         }
     }

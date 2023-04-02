@@ -2,6 +2,7 @@ package com.technomatesoftware.ergostats.modules
 
 import android.content.Context
 import androidx.room.Room
+import com.technomatesoftware.ergostats.config.AppBrowser
 import com.technomatesoftware.ergostats.config.NumberFormatter
 import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoPlatformDao
@@ -45,6 +46,12 @@ class AppModule {
     @Singleton
     fun provideNumberFormatter(): NumberFormatter {
         return NumberFormatter()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppBrowser(): AppBrowser {
+        return AppBrowser()
     }
 
     @Provides

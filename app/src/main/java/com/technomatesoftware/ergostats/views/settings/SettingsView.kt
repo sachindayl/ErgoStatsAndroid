@@ -1,5 +1,6 @@
 package com.technomatesoftware.ergostats.views.settings
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -16,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.technomatesoftware.ergostats.BuildConfig
 import com.technomatesoftware.ergostats.R
+import com.technomatesoftware.ergostats.config.AppBrowser
 import com.technomatesoftware.ergostats.viewmodel.MainViewModel
 import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
 import java.time.LocalDateTime
@@ -43,6 +46,9 @@ fun SettingsView(
 @Composable
 fun SettingsViewBody(padding: PaddingValues) {
     val year = LocalDateTime.now().year
+    val appBrowser = AppBrowser()
+    val context = LocalContext.current
+
     Column(
         Modifier
             .padding(padding)
@@ -65,6 +71,9 @@ fun SettingsViewBody(padding: PaddingValues) {
                     painter = painterResource(id = R.drawable.gecko),
                     contentDescription = "gecko"
                 )
+            },
+            modifier = Modifier.clickable {
+                appBrowser.openBrowserTab(context = context, "https://www.coingecko.com")
             }
         )
         Divider()
@@ -80,6 +89,9 @@ fun SettingsViewBody(padding: PaddingValues) {
                     painter = painterResource(id = R.drawable.watch),
                     contentDescription = "watch"
                 )
+            },
+            modifier = Modifier.clickable {
+                appBrowser.openBrowserTab(context = context, "https://www.ergo.watch/metrics")
             }
         )
         Divider()
@@ -93,8 +105,11 @@ fun SettingsViewBody(padding: PaddingValues) {
             leadingContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.money),
-                    contentDescription = "money"
+                    contentDescription = "tokenjay"
                 )
+            },
+            modifier = Modifier.clickable {
+                appBrowser.openBrowserTab(context = context, "https://www.tokenjay.app")
             }
         )
         Divider()
@@ -132,6 +147,12 @@ fun SettingsViewBody(padding: PaddingValues) {
                     painter = painterResource(id = R.drawable.github),
                     contentDescription = "github"
                 )
+            },
+            modifier = Modifier.clickable {
+                appBrowser.openBrowserTab(
+                    context = context,
+                    "https://github.com/sachindayl/ErgoStatsAndroid"
+                )
             }
         )
         Divider()
@@ -146,6 +167,12 @@ fun SettingsViewBody(padding: PaddingValues) {
                 Icon(
                     painter = painterResource(id = R.drawable.discord),
                     contentDescription = "discord"
+                )
+            },
+            modifier = Modifier.clickable {
+                appBrowser.openBrowserTab(
+                    context = context,
+                    "https://www.discord.gg/ergo-platform-668903786361651200"
                 )
             }
         )

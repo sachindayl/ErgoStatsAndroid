@@ -6,8 +6,12 @@ import com.technomatesoftware.ergostats.config.NumberFormatter
 import com.technomatesoftware.ergostats.domain.dao.CoinGeckoDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoPlatformDao
 import com.technomatesoftware.ergostats.domain.dao.ErgoWatchDao
+import com.technomatesoftware.ergostats.domain.dao.TokenJayDao
 import com.technomatesoftware.ergostats.domain.database.ErgoStatsDB
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_1_2
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_2_3
 import com.technomatesoftware.ergostats.domain.database.MIGRATION_3_4
+import com.technomatesoftware.ergostats.domain.database.MIGRATION_4_5
 import com.technomatesoftware.ergostats.network.interfaces.CoinGeckoRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoPlatformRepository
 import com.technomatesoftware.ergostats.network.interfaces.ErgoWatchRepository
@@ -50,7 +54,10 @@ class AppModule {
             appContext,
             ErgoStatsDB::class.java, "ergo-stats"
         )
+            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_2_3)
             .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
             .build()
     }
 
@@ -152,6 +159,11 @@ class AppModule {
     }
 
     @Provides
+    fun provideTokenJayDao(ergoStatsDB: ErgoStatsDB): TokenJayDao {
+        return ergoStatsDB.tokenJayDao()
+    }
+
+    @Provides
     fun provideCoinGeckoRepository(
         coinGeckoService: CoinGeckoService,
         coinGeckoDao: CoinGeckoDao
@@ -181,8 +193,10 @@ class AppModule {
 
     @Provides
     fun provideTokenJayRepository(
-        tokenJayService: TokenJayService
+        tokenJayService: TokenJayService,
+        tokenJayDao: TokenJayDao
     ): TokenJayRepository = TokenJayRepositoryImpl(
-        tokenJayService
+        tokenJayService,
+        tokenJayDao
     )
 }

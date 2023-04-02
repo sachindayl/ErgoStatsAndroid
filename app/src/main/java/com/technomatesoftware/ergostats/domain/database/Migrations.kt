@@ -54,3 +54,15 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         )
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `age_usd` " +
+                    "(`id` INTEGER NOT NULL PRIMARY KEY, " +
+                    "`reserve_ratio` INTEGER NOT NULL, " +
+                    "`sigma_usd_price` INTEGER NOT NULL, " +
+                    "`sigma_rsv_price` INTEGER NOT NULL)"
+        )
+    }
+}

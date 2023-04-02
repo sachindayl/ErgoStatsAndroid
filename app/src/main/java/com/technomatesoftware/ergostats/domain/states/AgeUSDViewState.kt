@@ -7,5 +7,7 @@ data class AgeUSDViewState(
     val sigmaUSDValue: String = EMPTY_STRING,
     val sigmaUSDPerErgValue: String = EMPTY_STRING,
     val sigmaReserveValue: String = EMPTY_STRING,
-    val sigmaReservePerErgValue: String = EMPTY_STRING
+    val sigmaReservePerErgValue: String = EMPTY_STRING,
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
 )

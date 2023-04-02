@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface TokenJayRepository {
     suspend fun fetchAgeUSDInfo(): Flow<Response<AgeUSDModel>>
+    suspend fun fetchStoredAgeUSDInfo(): Flow<Response<AgeUSDModel>>
+    suspend fun replaceAgeUSDInfo(ageUsdData: AgeUSDModel?)
 }

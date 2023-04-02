@@ -14,7 +14,7 @@ fun Heading(paddingValues: PaddingValues = PaddingValues(horizontal = 16.dp), ti
     title?.let {
         Text(
             it,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(paddingValues)
         )

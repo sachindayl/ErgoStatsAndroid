@@ -1,10 +1,6 @@
 package com.technomatesoftware.ergostats.views.richlist
 
-import android.content.Context
-import android.net.Uri
 import androidx.appcompat.R.*
-import androidx.browser.customtabs.CustomTabColorSchemeParams
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.technomatesoftware.ergostats.config.AppBrowser
 import com.technomatesoftware.ergostats.domain.states.RichListViewState
 import com.technomatesoftware.ergostats.viewmodel.MainViewModel
 import com.technomatesoftware.ergostats.viewmodel.MainViewModelSingleton
@@ -51,6 +47,7 @@ fun RichListView(
     val currentState: State<RichListViewState> =
         richListViewModel.viewState.collectAsState()
     val context = LocalContext.current
+    val appBrowser = AppBrowser()
 
     val listModifier = Modifier
         .padding(padding)
@@ -90,7 +87,7 @@ fun RichListView(
 
                     },
                     modifier = Modifier.clickable {
-                        openBrowserTab(context = context, "$baseUrl/${model.address}")
+                        appBrowser.openBrowserTab(context = context, "$baseUrl/${model.address}")
                     }
                 )
                 Divider()
@@ -99,37 +96,6 @@ fun RichListView(
     }
 
 
-}
-
-fun openBrowserTab(context: Context, url: String) {
-    val packageName = "com.android.chrome"
-    val builder = CustomTabsIntent.Builder()
-    builder.setShowTitle(true)
-    builder.setInstantAppsEnabled(true)
-    val params = CustomTabColorSchemeParams.Builder()
-        .setNavigationBarColor(
-            ContextCompat.getColor(
-                context,
-                color.primary_material_dark
-            )
-        )
-        .setToolbarColor(
-            ContextCompat.getColor(
-                context,
-                color.primary_material_dark
-            )
-        )
-        .setSecondaryToolbarColor(
-            ContextCompat.getColor(
-                context,
-                color.primary_material_dark
-            )
-        )
-        .build()
-    builder.setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_DARK, params)
-    val customBuilder = builder.build()
-    customBuilder.intent.setPackage(packageName)
-    customBuilder.launchUrl(context, Uri.parse(url))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

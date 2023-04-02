@@ -178,7 +178,7 @@ fun SettingsViewBody(padding: PaddingValues) {
         )
         Divider()
         Text(
-            "Privacy Policy",
+            "Legal",
             style = MaterialTheme.typography.labelLarge,
             modifier = Modifier
                 .padding(top = 32.dp)
@@ -187,7 +187,7 @@ fun SettingsViewBody(padding: PaddingValues) {
         ListItem(
             headlineText = {
                 Text(
-                    "The privacy policy can be found on GitHub",
+                    "Ergo Stats Privacy Policy",
                     style = MaterialTheme.typography.titleMedium
                 )
             },
@@ -195,6 +195,12 @@ fun SettingsViewBody(padding: PaddingValues) {
                 Icon(
                     painter = painterResource(id = R.drawable.policy),
                     contentDescription = "policy"
+                )
+            },
+            modifier = Modifier.clickable {
+                appBrowser.openBrowserTab(
+                    context = context,
+                    "https://sites.google.com/view/ergo-stats/privacy-policy"
                 )
             }
         )

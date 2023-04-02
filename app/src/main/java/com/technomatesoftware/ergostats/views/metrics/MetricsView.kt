@@ -63,8 +63,8 @@ fun MetricsView(
         horizontalAlignment = Alignment.Start
 
     ) {
-        AddressesList(mainViewModel, metricsViewModel, navController)
         EmissionsGrid(metricsViewModel)
+        AddressesList(metricsViewModel, navController)
         SupplyDistribution(metricsViewModel, navController)
         UsageContainer(metricsViewModel, navController)
     }
@@ -73,7 +73,6 @@ fun MetricsView(
 
 @Composable
 fun AddressesList(
-    mainViewModel: MainViewModel,
     metricsViewModel: MetricsViewModel,
     navController: NavController
 ) {

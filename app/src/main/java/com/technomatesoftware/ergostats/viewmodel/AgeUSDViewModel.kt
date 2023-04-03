@@ -50,6 +50,7 @@ class AgeUSDViewModel @Inject constructor(
 
                 is Response.Failure -> {
                     Log.d("ageUSDInfo", storedData.e.toString())
+                    ageUSDInfo()
                     _viewState.value = _viewState.value.copy(
                         isLoading = false,
                         errorMessage = "Unexpected error occurred"

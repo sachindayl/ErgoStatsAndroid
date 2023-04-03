@@ -62,13 +62,13 @@ class MetricsViewModel @Inject constructor(
     private fun loadData() {
         viewModelScope.launch {
             getStoredCirculatingSupply()
+            getCirculatingNetworkSupply()
             getStoredSummaryAddressData()
             getStoredSupplyDistributionData()
             getStoredUsageData()
             getSummaryAddressNetworkData()
             getSupplyDistributionNetworkData()
             getUsageNetworkData()
-            getCirculatingNetworkSupply()
         }
     }
 
